@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,36 +7,153 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum Role {
+  USER
+  ADMIN
+}
 
-  zakatRecords ZakatRecord[]
+enum ZakatSchool {
+  HANAFI
+  MALIKI
+  SHAFIITE
+  HANBALITE
+}
+
+enum Category {
+  ZAKAT
+  PERSONAL
+  RELIGIOUS
+  ASSOCIATION
+  HUMANITARIAN
+}
+
+enum RequestStatus {
+  DRAFT
+  SUBMITTED
+  REVIEW
+  PUBLISHED
+  REJECTED
+  CLOSED
+}
+
+enum PaymentMethod {
+  STRIPE_CARD
+  PAYPAL
+  BANK_TRANSFER
+}
+
+enum DonationStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+enum NisabType {
+  GOLD
+  SILVER
+}
+
+model User {
+  id            String      @id @default(uuid())
+  email         String      @unique
+  password      String
+  name          String?
+  role          Role        @default(USER)
+  country       String?
+  locale        String      @default("ar")
+  currency      String      @default("MAD")
+  zakatSchool   ZakatSchool @default(MALIKI)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  requests      Request[]
+  siteDonations SiteDonation[]
+  zakatCalcs    ZakatCalculation[]
 
   @@map("users")
 }
 
-model ZakatRecord {
-  id        String   @id @default(cuid())
-  userId    String
-  year      Int
-  goldValue Float    @default(0)
-  silverValue Float  @default(0)
-  cashValue Float    @default(0)
-  stocksValue Float  @default(0)
-  totalAssets Float  @default(0)
-  nisabValue Float   @default(0)
-  zakatAmount Float  @default(0)
-  currency  String   @default("DZD")
-  notes     String?
+model Request {
+  id            String        @id @default(uuid())
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
+  category      Category
+  titleAr       String
+  titleFr       String?
+  descriptionAr String
+  targetAmount  Decimal
+  currentAmount Decimal       @default(0)
+  status        RequestStatus @default(DRAFT)
+  iban          String
+  referenceCode String        @unique
+  country       String
+  isUrgent      Boolean       @default(false)
+  deadline      DateTime?
+  isAnonymous   Boolean       @default(false)
+  documents     Json          @default("[]")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  updates       RequestUpdate[]
+
+  @@map("requests")
+}
+
+model RequestUpdate {
+  id        String   @id @default(uuid())
+  requestId String
+  request   Request  @relation(fields: [requestId], references: [id])
+  contentAr String
+  contentFr String?
+  photos    Json     @default("[]")
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@map("request_updates")
+}
 
-  @@map("zakat_records")
+model SiteDonation {
+  id                  String         @id @default(uuid())
+  userId              String?
+  user                User?          @relation(fields: [userId], references: [id])
+  amount              Decimal
+  currency            String         @default("EUR")
+  method              PaymentMethod
+  stripePaymentIntent String?
+  status              DonationStatus @default(PENDING)
+  receiptNumber       String?        @unique
+  createdAt           DateTime       @default(now())
+
+  @@map("site_donations")
+}
+
+model ZakatCalculation {
+  id           String      @id @default(uuid())
+  userId       String
+  user         User        @relation(fields: [userId], references: [id])
+  currency     String
+  nisabType    NisabType
+  goldPrice    Decimal
+  silverPrice  Decimal
+  totalAssets  Decimal
+  debts        Decimal
+  netAssets    Decimal
+  zakatAmount  Decimal
+  hawlStart    DateTime
+  hawlEnd      DateTime
+  school       ZakatSchool
+  items        ZakatItem[]
+  createdAt    DateTime    @default(now())
+
+  @@map("zakat_calculations")
+}
+
+model ZakatItem {
+  id            String           @id @default(uuid())
+  calculationId String
+  calculation   ZakatCalculation @relation(fields: [calculationId], references: [id])
+  category      String
+  amount        Decimal
+  amountBase    Decimal
+  notes         String?
+
+  @@map("zakat_items")
 }
