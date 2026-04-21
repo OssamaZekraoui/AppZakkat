@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import type { RequestFormData, RequestCategory } from "@/types/demandes";
 import { DEFAULT_FORM_DATA } from "@/types/demandes";
 import { validateStep } from "@/lib/validations/demande";
+import type { DocumentVerificationResult } from "@/types/verification";
 
 import Step0Category from "./steps/Step0Category";
 import Step1Identity from "./steps/Step1Identity";
@@ -33,6 +34,7 @@ export default function NewRequestWizard({ locale }: NewRequestWizardProps) {
   const [submitted, setSubmitted] = useState(false);
   const [referenceCode, setReferenceCode] = useState("");
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [documentVerifications, setDocumentVerifications] = useState<DocumentVerificationResult[]>([]);
   const autoSaveTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Load draft
@@ -112,7 +114,7 @@ export default function NewRequestWizard({ locale }: NewRequestWizardProps) {
       const res = await fetch("/api/demandes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, status: "SUBMITTED" }),
+        body: JSON.stringify({ ...formData, status: "SUBMITTED", documentVerifications }),
       });
 
       if (res.ok) {
@@ -249,6 +251,7 @@ export default function NewRequestWizard({ locale }: NewRequestWizardProps) {
             onChange={updateField}
             errors={errors}
             locale={locale}
+            onVerificationResults={setDocumentVerifications}
           />
         )}
         {step === 6 && (

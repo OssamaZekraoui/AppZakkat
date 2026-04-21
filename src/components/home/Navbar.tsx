@@ -17,9 +17,9 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const navLinks = [
-    { href: "#requests", label: t("requests") },
-    { href: "#zakat", label: t("zakatCalculator") },
-    { href: "#how-it-works", label: t("howItWorks") },
+    { href: "/demandes", label: t("requests"), isRoute: true },
+    { href: "#zakat", label: t("zakatCalculator"), isRoute: false },
+    { href: "#how-it-works", label: t("howItWorks"), isRoute: false },
   ];
 
   return (
@@ -50,15 +50,25 @@ export default function Navbar() {
 
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-6">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="text-white/80 hover:text-white text-sm font-cairo transition-colors"
-              >
-                {link.label}
-              </a>
-            ))}
+            {navLinks.map((link) =>
+              link.isRoute ? (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-white/80 hover:text-white text-sm font-cairo transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="text-white/80 hover:text-white text-sm font-cairo transition-colors"
+                >
+                  {link.label}
+                </a>
+              )
+            )}
             <a
               href="#support-site"
               className="text-gold hover:text-gold-light text-sm font-cairo font-bold transition-colors"
@@ -123,16 +133,27 @@ export default function Navbar() {
       {/* Mobile menu */}
       {mobileOpen && (
         <div className="md:hidden bg-green-deep border-t border-gold/20 px-4 py-4 space-y-3">
-          {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={() => setMobileOpen(false)}
-              className="block text-white/80 hover:text-white font-cairo py-2"
-            >
-              {link.label}
-            </a>
-          ))}
+          {navLinks.map((link) =>
+            link.isRoute ? (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileOpen(false)}
+                className="block text-white/80 hover:text-white font-cairo py-2"
+              >
+                {link.label}
+              </Link>
+            ) : (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileOpen(false)}
+                className="block text-white/80 hover:text-white font-cairo py-2"
+              >
+                {link.label}
+              </a>
+            )
+          )}
           <a
             href="#support-site"
             onClick={() => setMobileOpen(false)}

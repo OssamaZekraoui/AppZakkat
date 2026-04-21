@@ -1,16 +1,18 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 
 const steps = [
-  { num: "١", icon: "📝", titleKey: "step1Title", descKey: "step1Desc" },
-  { num: "٢", icon: "🔍", titleKey: "step2Title", descKey: "step2Desc" },
-  { num: "٣", icon: "🏦", titleKey: "step3Title", descKey: "step3Desc" },
-  { num: "٤", icon: "✅", titleKey: "step4Title", descKey: "step4Desc" },
+  { num: 1, icon: "📝", titleKey: "step1Title", descKey: "step1Desc" },
+  { num: 2, icon: "🔍", titleKey: "step2Title", descKey: "step2Desc" },
+  { num: 3, icon: "🏦", titleKey: "step3Title", descKey: "step3Desc" },
+  { num: 4, icon: "✅", titleKey: "step4Title", descKey: "step4Desc" },
 ] as const;
 
 export default function HowItWorks() {
   const t = useTranslations("howItWorks");
+  const locale = useLocale();
 
   return (
     <section id="how-it-works" className="bg-cream py-16 sm:py-24 px-4">
@@ -28,7 +30,7 @@ export default function HowItWorks() {
               {/* Step number */}
               <div className="w-12 h-12 rounded-full bg-gold/20 flex items-center justify-center mx-auto mb-4">
                 <span className="text-gold font-amiri text-2xl font-bold">
-                  {step.num}
+                  {locale === "ar" ? step.num.toLocaleString("ar-MA") : step.num}
                 </span>
               </div>
 

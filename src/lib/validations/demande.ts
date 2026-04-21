@@ -9,6 +9,8 @@ export const step0Schema = z.object({
     "HUMANITARIAN",
     "EDUCATION",
     "FUNERAL",
+    "EID",
+    "ORPHANS",
   ]),
 });
 

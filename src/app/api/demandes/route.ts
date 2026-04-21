@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 import { fullRequestSchema } from "@/lib/validations/demande";
 
-// In-memory store for development (replace with Prisma in production)
-const requests: Record<string, unknown> = {};
-let requestCount = 0;
-
 function generateReferenceCode(): string {
-  requestCount++;
   const year = new Date().getFullYear();
-  return `DY-${year}-${String(requestCount).padStart(4, "0")}`;
+  const rand = Math.floor(1000 + Math.random() * 9000);
+  return `DY-${year}-${rand}`;
 }
 
 // POST /api/demandes — Create a new request
@@ -16,23 +13,34 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
+    // TODO: get real userId from auth session
+    const userId = body.userId;
+    if (!userId) {
+      return NextResponse.json({ error: "userId is required" }, { status: 400 });
+    }
+
     // If draft, minimal validation
     if (body.status === "DRAFT") {
-      const id = crypto.randomUUID();
       const referenceCode = generateReferenceCode();
-      requests[id] = {
-        ...body,
-        id,
-        referenceCode,
-        status: "DRAFT",
-        currentAmount: 0,
-        progressPercent: 0,
-        donorCount: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        updates: [],
-      };
-      return NextResponse.json({ id, referenceCode, status: "DRAFT" });
+      const created = await prisma.request.create({
+        data: {
+          userId,
+          category: body.category || "PERSONAL",
+          titleAr: body.titleAr || "",
+          descriptionAr: body.descriptionAr || "",
+          targetAmount: body.targetAmount || 0,
+          iban: body.iban || "",
+          referenceCode,
+          country: body.country || "MA",
+          isUrgent: body.urgencyLevel === "URGENT" || body.urgencyLevel === "CRITICAL",
+          isAnonymous: body.isAnonymous || false,
+          deadline: body.deadline ? new Date(body.deadline) : null,
+          titleFr: body.titleFr || null,
+          documents: body.documents || [],
+          status: "DRAFT",
+        },
+      });
+      return NextResponse.json({ id: created.id, referenceCode, status: "DRAFT" });
     }
 
     // Full validation for submission
@@ -45,24 +53,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Validation failed", errors }, { status: 400 });
     }
 
-    const id = crypto.randomUUID();
+    const data = validation.data;
     const referenceCode = generateReferenceCode();
 
-    requests[id] = {
-      ...validation.data,
-      id,
-      referenceCode,
-      status: "SUBMITTED",
-      currentAmount: 0,
-      progressPercent: 0,
-      donorCount: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      updates: [],
-    };
+    const created = await prisma.request.create({
+      data: {
+        userId,
+        category: data.category,
+        titleAr: data.titleAr,
+        titleFr: data.titleFr || null,
+        descriptionAr: data.descriptionAr,
+        targetAmount: data.targetAmount,
+        iban: data.iban,
+        referenceCode,
+        country: data.country,
+        isUrgent: data.urgencyLevel === "URGENT" || data.urgencyLevel === "CRITICAL",
+        isAnonymous: data.isAnonymous,
+        deadline: data.deadline ? new Date(data.deadline) : null,
+        documents: data.documents,
+        status: "SUBMITTED",
+      },
+    });
 
     return NextResponse.json({
-      id,
+      id: created.id,
       referenceCode,
       status: "SUBMITTED",
     });
@@ -72,35 +86,83 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET /api/demandes — List published requests
+// GET /api/demandes — List requests
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get("category");
     const country = searchParams.get("country");
+    const status = searchParams.get("status");
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
 
-    let results = Object.values(requests).filter(
-      (r: unknown) => (r as Record<string, unknown>).status === "PUBLISHED"
-    );
+    const where: Record<string, unknown> = {};
+
+    // By default show PUBLISHED requests (public listing)
+    if (status) {
+      where.status = status;
+    } else {
+      where.status = "PUBLISHED";
+    }
 
     if (category) {
-      results = results.filter(
-        (r: unknown) => (r as Record<string, unknown>).category === category
-      );
+      where.category = category;
     }
     if (country) {
-      results = results.filter(
-        (r: unknown) => (r as Record<string, unknown>).country === country
-      );
+      where.country = country;
     }
 
-    const total = results.length;
-    const paginated = results.slice((page - 1) * limit, page * limit);
+    const [requests, total] = await Promise.all([
+      prisma.request.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * limit,
+        take: limit,
+        include: {
+          user: {
+            select: { name: true },
+          },
+          updates: {
+            orderBy: { createdAt: "desc" },
+            take: 3,
+          },
+        },
+      }),
+      prisma.request.count({ where }),
+    ]);
+
+    const formatted = requests.map((r) => ({
+      id: r.id,
+      referenceCode: r.referenceCode,
+      category: r.category,
+      titleAr: r.titleAr,
+      titleFr: r.titleFr,
+      descriptionAr: r.descriptionAr,
+      targetAmount: Number(r.targetAmount),
+      currentAmount: Number(r.currentAmount),
+      progressPercent: r.targetAmount > 0
+        ? Math.round((Number(r.currentAmount) / Number(r.targetAmount)) * 100)
+        : 0,
+      status: r.status,
+      country: r.country,
+      isUrgent: r.isUrgent,
+      isAnonymous: r.isAnonymous,
+      deadline: r.deadline?.toISOString() || null,
+      donorCount: 0,
+      createdAt: r.createdAt.toISOString(),
+      updatedAt: r.updatedAt.toISOString(),
+      userName: r.isAnonymous ? null : r.user?.name,
+      updates: r.updates.map((u) => ({
+        id: u.id,
+        contentAr: u.contentAr,
+        contentFr: u.contentFr,
+        photos: u.photos,
+        createdAt: u.createdAt.toISOString(),
+      })),
+    }));
 
     return NextResponse.json({
-      requests: paginated,
+      requests: formatted,
       total,
       page,
       totalPages: Math.ceil(total / limit),

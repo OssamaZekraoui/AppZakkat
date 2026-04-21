@@ -1,7 +1,9 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import type { RequestFormData, UploadedDocument, RequestCategory } from "@/types/demandes";
 import { REQUIRED_DOCS } from "@/types/demandes";
+import type { DocumentVerificationResult } from "@/types/verification";
 import DocumentUploader from "../ui/DocumentUploader";
 
 interface Step5Props {
@@ -9,40 +11,131 @@ interface Step5Props {
   onChange: (field: keyof RequestFormData, value: unknown) => void;
   errors: Record<string, string>;
   locale: string;
+  onVerificationResults?: (results: DocumentVerificationResult[]) => void;
 }
+
+type VerifyingState = Record<string, "pending" | "done">;
 
 export default function Step5Documents({
   data,
   onChange,
   errors,
   locale,
+  onVerificationResults,
 }: Step5Props) {
   const isAr = locale === "ar";
   const category = (data.category || "PERSONAL") as RequestCategory;
   const requirements = REQUIRED_DOCS[category] || [];
   const documents = (data.documents || []) as UploadedDocument[];
 
+  const [verifications, setVerifications] = useState<Record<string, DocumentVerificationResult>>({});
+  const [verifying, setVerifying] = useState<VerifyingState>({});
+
+  const triggerVerification = useCallback(
+    async (doc: UploadedDocument) => {
+      setVerifying((prev) => ({ ...prev, [doc.id]: "pending" }));
+      try {
+        const res = await fetch("/api/documents/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            documentId: doc.id,
+            documentUrl: doc.url,
+            mimeType: doc.mimeType,
+            category: doc.category,
+            userProvidedData: {
+              displayName: data.displayName,
+              targetAmount: data.targetAmount,
+              country: data.country,
+              city: data.city,
+            },
+          }),
+        });
+        if (res.ok) {
+          const result: DocumentVerificationResult = await res.json();
+          setVerifications((prev) => {
+            const updated = { ...prev, [doc.id]: result };
+            // Notify parent
+            if (onVerificationResults) {
+              onVerificationResults(Object.values(updated));
+            }
+            return updated;
+          });
+        }
+      } catch {
+        // silently fail for verification - it's supplementary
+      } finally {
+        setVerifying((prev) => ({ ...prev, [doc.id]: "done" }));
+      }
+    },
+    [data.displayName, data.targetAmount, data.country, data.city, onVerificationResults]
+  );
+
   const handleUpload = (doc: UploadedDocument) => {
     onChange("documents", [...documents, doc]);
+    // Trigger AI verification async
+    triggerVerification(doc);
   };
 
   const handleRemove = (id: string) => {
     onChange("documents", documents.filter((d) => d.id !== id));
-  };
-
-  const getUploadedForCategory = (cat: string, index: number) => {
-    return documents.find(
-      (d) => d.category === cat && documents.indexOf(d) === index
-    ) || documents.filter((d) => d.category === cat)[
-      requirements
-        .filter((r) => r.category === cat)
-        .indexOf(requirements.filter((r) => r.category === cat).find((_, i2) => i2 === requirements.slice(0, requirements.indexOf(requirements[index])).filter(r2 => r2.category === cat).length) || requirements[0])
-    ];
+    setVerifications((prev) => {
+      const updated = { ...prev };
+      delete updated[id];
+      if (onVerificationResults) {
+        onVerificationResults(Object.values(updated));
+      }
+      return updated;
+    });
+    setVerifying((prev) => {
+      const updated = { ...prev };
+      delete updated[id];
+      return updated;
+    });
   };
 
   // Simple approach: match by index in requirements list
   const getDocForRequirement = (reqIndex: number) => {
     return documents[reqIndex];
+  };
+
+  const getVerificationBadge = (docId: string | undefined) => {
+    if (!docId) return null;
+
+    if (verifying[docId] === "pending") {
+      return (
+        <span className="inline-flex items-center gap-1 text-xs font-cairo text-blue-500">
+          <span className="animate-spin inline-block w-3 h-3 border-2 border-blue-400 border-t-transparent rounded-full" />
+          {isAr ? "جاري التحقق..." : "Vérification..."}
+        </span>
+      );
+    }
+
+    const result = verifications[docId];
+    if (!result) return null;
+
+    if (result.status === "verified") {
+      return (
+        <span className="inline-flex items-center gap-1 text-xs font-cairo text-emerald-600 font-bold">
+          <span>&#10003;</span> {result.confidenceScore}%
+        </span>
+      );
+    }
+    if (result.status === "warning") {
+      return (
+        <span className="inline-flex items-center gap-1 text-xs font-cairo text-amber-600 font-bold">
+          <span>&#9888;</span> {result.confidenceScore}%
+        </span>
+      );
+    }
+    if (result.status === "rejected") {
+      return (
+        <span className="inline-flex items-center gap-1 text-xs font-cairo text-red-500 font-bold">
+          <span>&#10007;</span> {result.confidenceScore}%
+        </span>
+      );
+    }
+    return null;
   };
 
   return (
@@ -59,18 +152,26 @@ export default function Step5Documents({
       </div>
 
       <div className="space-y-4">
-        {requirements.map((req, i) => (
-          <DocumentUploader
-            key={`${req.category}-${i}`}
-            label={`${isAr ? req.labelAr : req.labelFr}${req.required ? "" : ` (${isAr ? "اختياري" : "optionnel"})`}`}
-            required={req.required}
-            category={req.category}
-            uploaded={getDocForRequirement(i)}
-            onUpload={handleUpload}
-            onRemove={handleRemove}
-            locale={locale}
-          />
-        ))}
+        {requirements.map((req, i) => {
+          const doc = getDocForRequirement(i);
+          return (
+            <div key={`${req.category}-${i}`}>
+              <div className="flex items-center justify-between mb-1">
+                <div />
+                {getVerificationBadge(doc?.id)}
+              </div>
+              <DocumentUploader
+                label={`${isAr ? req.labelAr : req.labelFr}${req.required ? "" : ` (${isAr ? "اختياري" : "optionnel"})`}`}
+                required={req.required}
+                category={req.category}
+                uploaded={doc}
+                onUpload={handleUpload}
+                onRemove={handleRemove}
+                locale={locale}
+              />
+            </div>
+          );
+        })}
 
         {/* Extra document */}
         <details className="group">

@@ -5,7 +5,9 @@ export type RequestCategory =
   | "ASSOCIATION"
   | "HUMANITARIAN"
   | "EDUCATION"
-  | "FUNERAL";
+  | "FUNERAL"
+  | "EID"
+  | "ORPHANS";
 
 export type RequestStatus =
   | "DRAFT"
@@ -207,6 +209,24 @@ export const CATEGORIES: CategoryInfo[] = [
     descAr: "تكاليف الجنازة والدفن",
     descFr: "Frais funéraires et d'inhumation",
   },
+  {
+    value: "EID",
+    labelAr: "عيد",
+    labelFr: "Aide pour l'Aïd",
+    labelEn: "Eid aid",
+    icon: "🌙",
+    descAr: "مساعدة لتجهيزات العيد والأضاحي",
+    descFr: "Aide pour les préparatifs de l'Aïd et les sacrifices",
+  },
+  {
+    value: "ORPHANS",
+    labelAr: "يتامى",
+    labelFr: "Orphelins",
+    labelEn: "Orphans",
+    icon: "👶",
+    descAr: "كفالة ورعاية الأيتام",
+    descFr: "Parrainage et prise en charge des orphelins",
+  },
 ];
 
 export interface DocumentRequirement {
@@ -248,6 +268,17 @@ export const REQUIRED_DOCS: Record<RequestCategory, DocumentRequirement[]> = {
   FUNERAL: [
     { category: "OTHER", labelAr: "شهادة الوفاة", labelFr: "Acte de décès", required: true },
     { category: "INVOICE", labelAr: "تكاليف الجنازة", labelFr: "Devis pompes funèbres", required: false },
+  ],
+  EID: [
+    { category: "PROOF_OF_IDENTITY", labelAr: "وثيقة هوية", labelFr: "Pièce d'identité", required: true },
+    { category: "INVOICE", labelAr: "فاتورة أو تقدير التكاليف", labelFr: "Facture ou estimation des coûts", required: false },
+    { category: "PHOTOS", labelAr: "صور داعمة", labelFr: "Photos justificatives", required: false },
+  ],
+  ORPHANS: [
+    { category: "PROOF_OF_IDENTITY", labelAr: "وثيقة هوية الكفيل", labelFr: "Pièce d'identité du tuteur", required: true },
+    { category: "OTHER", labelAr: "شهادة كفالة أو وثيقة رسمية", labelFr: "Attestation de prise en charge", required: true },
+    { category: "INVOICE", labelAr: "تكاليف الرعاية", labelFr: "Frais de prise en charge", required: false },
+    { category: "PHOTOS", labelAr: "صور داعمة", labelFr: "Photos justificatives", required: false },
   ],
 };
 

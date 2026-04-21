@@ -4,7 +4,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 enum Role {
@@ -22,9 +21,14 @@ enum ZakatSchool {
 enum Category {
   ZAKAT
   PERSONAL
+  MEDICAL
   RELIGIOUS
   ASSOCIATION
   HUMANITARIAN
+  EDUCATION
+  FUNERAL
+  EID
+  ORPHANS
 }
 
 enum RequestStatus {
@@ -91,6 +95,7 @@ model Request {
   deadline      DateTime?
   isAnonymous   Boolean       @default(false)
   documents     Json          @default("[]")
+  verifications Json          @default("[]")
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   updates       RequestUpdate[]

@@ -5,9 +5,14 @@ import { useTranslations } from "next-intl";
 const categories = [
   { icon: "🌙", key: "zakat" },
   { icon: "🤝", key: "personal" },
+  { icon: "🏥", key: "medical" },
   { icon: "🕌", key: "religious" },
   { icon: "🫶", key: "association" },
   { icon: "🌍", key: "humanitarian" },
+  { icon: "📚", key: "education" },
+  { icon: "🕊️", key: "funeral" },
+  { icon: "🌙", key: "eid" },
+  { icon: "👶", key: "orphans" },
 ] as const;
 
 export default function Categories() {
@@ -20,7 +25,7 @@ export default function Categories() {
           {t("title")}
         </h2>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {categories.map((cat) => (
             <button
               key={cat.key}
