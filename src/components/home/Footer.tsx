@@ -12,7 +12,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <span className="font-reem-kufi text-2xl font-bold">{t("brand")}</span>
+              <span className="font-amiri text-2xl font-bold">{t("brand")}</span>
             </div>
             <p className="text-white/60 font-cairo text-sm leading-relaxed">
               {t("tagline")}

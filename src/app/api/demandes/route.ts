@@ -131,35 +131,43 @@ export async function GET(request: NextRequest) {
       prisma.request.count({ where }),
     ]);
 
-    const formatted = requests.map((r) => ({
-      id: r.id,
-      referenceCode: r.referenceCode,
-      category: r.category,
-      titleAr: r.titleAr,
-      titleFr: r.titleFr,
-      descriptionAr: r.descriptionAr,
-      targetAmount: Number(r.targetAmount),
-      currentAmount: Number(r.currentAmount),
-      progressPercent: r.targetAmount > 0
-        ? Math.round((Number(r.currentAmount) / Number(r.targetAmount)) * 100)
-        : 0,
-      status: r.status,
-      country: r.country,
-      isUrgent: r.isUrgent,
-      isAnonymous: r.isAnonymous,
-      deadline: r.deadline?.toISOString() || null,
-      donorCount: 0,
-      createdAt: r.createdAt.toISOString(),
-      updatedAt: r.updatedAt.toISOString(),
-      userName: r.isAnonymous ? null : r.user?.name,
-      updates: r.updates.map((u) => ({
-        id: u.id,
-        contentAr: u.contentAr,
-        contentFr: u.contentFr,
-        photos: u.photos,
-        createdAt: u.createdAt.toISOString(),
-      })),
-    }));
+    const formatted = requests.map((r) => {
+      const docs = (r.documents as Record<string, unknown>) || {};
+      return {
+        id: r.id,
+        referenceCode: r.referenceCode,
+        category: r.category,
+        titleAr: r.titleAr,
+        titleFr: r.titleFr,
+        descriptionAr: r.descriptionAr,
+        targetAmount: Number(r.targetAmount),
+        currentAmount: Number(r.currentAmount),
+        currency: (docs.currency as string) || "MAD",
+        progressPercent: Number(r.targetAmount) > 0
+          ? Math.round((Number(r.currentAmount) / Number(r.targetAmount)) * 100)
+          : 0,
+        status: r.status,
+        country: r.country,
+        city: (docs.city as string) || "",
+        isUrgent: r.isUrgent,
+        urgencyLevel: r.isUrgent ? "URGENT" : "NORMAL",
+        isAnonymous: r.isAnonymous,
+        iban: r.iban,
+        deadline: r.deadline?.toISOString() || null,
+        documents: Array.isArray(docs.files) ? docs.files : (Array.isArray(r.documents) ? r.documents : []),
+        donorCount: 0,
+        displayName: r.isAnonymous ? "" : (r.user?.name || ""),
+        createdAt: r.createdAt.toISOString(),
+        updatedAt: r.updatedAt.toISOString(),
+        updates: r.updates.map((u) => ({
+          id: u.id,
+          contentAr: u.contentAr,
+          contentFr: u.contentFr,
+          photos: u.photos,
+          createdAt: u.createdAt.toISOString(),
+        })),
+      };
+    });
 
     return NextResponse.json({
       requests: formatted,
