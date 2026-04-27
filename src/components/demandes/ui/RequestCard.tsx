@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Link } from "@/i18n/navigation";
 import type { RequestWithStatus } from "@/types/demandes";
 import { CATEGORIES } from "@/types/demandes";
 import RequestStatusBadge from "./RequestStatusBadge";
@@ -37,65 +38,74 @@ export default function RequestCard({ request, locale }: RequestCardProps) {
 
   return (
     <div className="bg-white rounded-2xl border border-green-deep/10 overflow-hidden hover:shadow-lg transition-shadow">
-      {/* Header */}
-      <div className="p-5 pb-3">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">{cat?.icon}</span>
-            <span className="font-cairo text-xs text-green-deep/50">
-              {isAr ? cat?.labelAr : cat?.labelFr}
+      <Link href={`/demandes/${request.id}`} className="block cursor-pointer">
+        {/* Header */}
+        <div className="p-5 pb-3">
+          <div className="flex items-start justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">{cat?.icon}</span>
+              <span className="font-cairo text-xs text-green-deep/50">
+                {isAr ? cat?.labelAr : cat?.labelFr}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              {request.urgencyLevel === "CRITICAL" && (
+                <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full font-cairo">
+                  {isAr ? "حرج" : "Critique"}
+                </span>
+              )}
+              {request.urgencyLevel === "URGENT" && (
+                <span className="bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full font-cairo">
+                  {isAr ? "عاجل" : "Urgent"}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <h3 className="font-amiri text-lg font-bold text-green-deep leading-snug mb-1">
+            {request.titleAr}
+          </h3>
+          {request.titleFr && (
+            <p className="font-cairo text-xs text-green-deep/40 mb-2">
+              {request.titleFr}
+            </p>
+          )}
+
+          <div className="flex items-center gap-1 text-xs text-green-deep/50 font-cairo">
+            <span>{request.city}, {request.country}</span>
+          </div>
+        </div>
+
+        {/* Progress */}
+        <div className="px-5 pb-3">
+          <div className="h-2 bg-green-deep/5 rounded-full overflow-hidden mb-2">
+            <div
+              className="h-full bg-gradient-to-r from-green-medium to-gold rounded-full transition-all"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="font-lato text-sm font-bold text-green-deep" dir="ltr">
+              {fmt(request.currentAmount)} / {fmt(request.targetAmount)} {request.currency}
+            </span>
+            <span className="font-lato text-xs text-green-deep/40" dir="ltr">
+              {progress}%
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            {request.urgencyLevel === "CRITICAL" && (
-              <span className="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full font-cairo">
-                {isAr ? "حرج" : "Critique"}
-              </span>
-            )}
-            {request.urgencyLevel === "URGENT" && (
-              <span className="bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full font-cairo">
-                {isAr ? "عاجل" : "Urgent"}
-              </span>
-            )}
-          </div>
         </div>
 
-        <h3 className="font-amiri text-lg font-bold text-green-deep leading-snug mb-1">
-          {request.titleAr}
-        </h3>
-        {request.titleFr && (
-          <p className="font-cairo text-xs text-green-deep/40 mb-2">
-            {request.titleFr}
-          </p>
-        )}
-
-        <div className="flex items-center gap-1 text-xs text-green-deep/50 font-cairo">
-          <span>📍</span>
-          <span>{request.city}, {request.country}</span>
-        </div>
-      </div>
-
-      {/* Progress */}
-      <div className="px-5 pb-3">
-        <div className="h-2 bg-green-deep/5 rounded-full overflow-hidden mb-2">
-          <div
-            className="h-full bg-gradient-to-r from-green-medium to-gold rounded-full transition-all"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="font-lato text-sm font-bold text-green-deep" dir="ltr">
-            {fmt(request.currentAmount)} / {fmt(request.targetAmount)} {request.currency}
-          </span>
-          <span className="font-lato text-xs text-green-deep/40" dir="ltr">
-            {progress}%
+        {/* Footer */}
+        <div className="px-5 pb-4 flex items-center justify-between">
+          <RequestStatusBadge status={request.status} locale={locale} />
+          <span className="font-lato text-[10px] text-green-deep/30">
+            {request.referenceCode}
           </span>
         </div>
-      </div>
+      </Link>
 
-      {/* IBAN - visible for PUBLISHED */}
+      {/* IBAN - outside Link to allow copy button interaction */}
       {request.status === "PUBLISHED" && request.iban && (
-        <div className="mx-5 mb-3 bg-cream rounded-xl p-3 border border-gold/20">
+        <div className="mx-5 mb-4 bg-cream rounded-xl p-3 border border-gold/20">
           <p className="font-cairo text-[10px] text-green-deep/50 mb-1">
             {isAr ? "التبرع بالتحويل البنكي مباشرة" : "Don par virement bancaire direct"}
           </p>
@@ -112,14 +122,6 @@ export default function RequestCard({ request, locale }: RequestCardProps) {
           </div>
         </div>
       )}
-
-      {/* Footer */}
-      <div className="px-5 pb-4 flex items-center justify-between">
-        <RequestStatusBadge status={request.status} locale={locale} />
-        <span className="font-lato text-[10px] text-green-deep/30">
-          {request.referenceCode}
-        </span>
-      </div>
     </div>
   );
 }

@@ -2,7 +2,7 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
-import { Amiri, Cairo, Lato, Reem_Kufi } from "next/font/google";
+import { Amiri, Cairo, Lato, Reem_Kufi, Crimson_Text } from "next/font/google";
 
 const amiri = Amiri({
   weight: ["400", "700"],
@@ -30,6 +30,13 @@ const reemKufi = Reem_Kufi({
   display: "swap",
 });
 
+const crimsonText = Crimson_Text({
+  weight: ["400", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-crimson",
+  display: "swap",
+});
+
 export default async function LocaleLayout({
   children,
   params,
@@ -50,7 +57,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} dir={dir}>
       <body
-        className={`${amiri.variable} ${cairo.variable} ${lato.variable} ${reemKufi.variable} ${fontBody} antialiased`}
+        className={`${amiri.variable} ${cairo.variable} ${lato.variable} ${reemKufi.variable} ${crimsonText.variable} ${fontBody} antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
           {children}

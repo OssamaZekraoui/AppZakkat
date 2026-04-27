@@ -10,7 +10,16 @@
       "Bash(npx next build)",
       "Bash(npx prisma:*)",
       "Bash(npx tsc:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(git push:*)",
+      "Bash(ssh:*)",
+      "Bash(find:*)",
+      "Bash(npx next dev)",
+      "Bash(taskkill:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)"
     ]
   }
 }

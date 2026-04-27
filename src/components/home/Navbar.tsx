@@ -30,18 +30,15 @@ export default function Navbar() {
           <Link href="/" className="group flex items-center gap-0">
             {locale === "ar" ? (
               <span className="relative select-none">
-                <span className="text-gold font-reem-kufi text-3xl sm:text-4xl font-bold drop-shadow-[0_0_8px_rgba(201,168,76,0.4)] group-hover:drop-shadow-[0_0_12px_rgba(201,168,76,0.6)] transition-all duration-300">
+                <span className="text-gold font-amiri text-3xl sm:text-4xl font-bold drop-shadow-[0_0_8px_rgba(201,168,76,0.4)] group-hover:drop-shadow-[0_0_12px_rgba(201,168,76,0.6)] transition-all duration-300">
                   ضياء
                 </span>
                 <span className="absolute -bottom-1 right-0 w-full h-[2px] bg-gradient-to-l from-gold via-gold-light to-transparent rounded-full" />
               </span>
             ) : (
               <span className="relative select-none">
-                <span className="text-gold font-amiri text-3xl sm:text-4xl leading-none drop-shadow-[0_0_8px_rgba(201,168,76,0.4)] group-hover:drop-shadow-[0_0_12px_rgba(201,168,76,0.6)] transition-all duration-300">
-                  D
-                </span>
-                <span className="text-white/90 font-lato uppercase text-lg sm:text-xl tracking-[0.25em] group-hover:text-white transition-colors duration-300">
-                  iyae
+                <span className="text-gold font-crimson text-3xl sm:text-4xl font-semibold leading-none drop-shadow-[0_0_8px_rgba(201,168,76,0.4)] group-hover:drop-shadow-[0_0_12px_rgba(201,168,76,0.6)] transition-all duration-300">
+                  Diyae
                 </span>
                 <span className="absolute -bottom-1 left-0 w-full h-[2px] bg-gradient-to-r from-gold via-gold-light to-transparent rounded-full" />
               </span>

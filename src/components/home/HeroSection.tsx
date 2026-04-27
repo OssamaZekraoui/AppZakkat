@@ -25,11 +25,11 @@ export default function HeroSection() {
         {isArabic ? (
           <>
             {/* Title: Arabic then Latin */}
-            <h1 className="font-reem-kufi text-white font-bold leading-tight mb-1" style={{ fontSize: "clamp(52px, 10vw, 96px)" }}>
+            <h1 className="font-amiri text-white font-bold leading-tight mb-1" style={{ fontSize: "clamp(52px, 10vw, 96px)" }}>
               ضياء
             </h1>
-            <p className="text-white/40 tracking-[0.25em] text-lg sm:text-xl mb-6 font-lato font-bold">
-              DIYAE
+            <p className="text-white/40 tracking-[0.1em] text-lg sm:text-xl mb-6 font-crimson font-semibold">
+              Diyae
             </p>
             {/* Slogan: Arabic then French */}
             <p className="text-gold font-cairo text-xl sm:text-2xl font-bold mb-1">
@@ -42,10 +42,10 @@ export default function HeroSection() {
         ) : (
           <>
             {/* Title: Latin then Arabic */}
-            <h1 className="font-lato text-white font-bold tracking-[0.15em] leading-tight mb-1" style={{ fontSize: "clamp(52px, 10vw, 96px)" }}>
-              DIYAE
+            <h1 className="font-crimson text-white font-bold leading-tight mb-1" style={{ fontSize: "clamp(52px, 10vw, 96px)" }}>
+              Diyae
             </h1>
-            <p className="text-white/40 font-reem-kufi text-2xl sm:text-3xl font-bold mb-6">
+            <p className="text-white/40 font-amiri text-2xl sm:text-3xl font-bold mb-6">
               ضياء
             </p>
             {/* Slogan: current language then Arabic */}
