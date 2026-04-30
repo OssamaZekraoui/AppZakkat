@@ -1,49 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getRequestsStore } from "@/lib/stores/requestsStore";
+import { prisma } from "@/lib/prisma";
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
 
-// POST /api/admin/demandes/[id]/review — Submit review decision
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id } = await params;
+async function verifyAdmin() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token")?.value;
+  if (!token) throw new Error("Unauthorized");
+  const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { role: string };
+  if (decoded.role !== "ADMIN") throw new Error("Forbidden");
+}
 
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    try { await verifyAdmin(); } catch (e: any) {
+      return NextResponse.json({ error: e.message }, { status: e.message === "Forbidden" ? 403 : 401 });
+    }
+    
     const body = await request.json();
-    const { decision, note } = body;
-
-    if (!decision || !["APPROVED", "REJECTED"].includes(decision)) {
-      return NextResponse.json(
-        { error: "Invalid decision. Must be APPROVED or REJECTED." },
-        { status: 400 }
-      );
-    }
-
-    const store = getRequestsStore();
-    const req = store[id] as Record<string, unknown> | undefined;
-
-    const newStatus = decision === "APPROVED" ? "PUBLISHED" : "REJECTED";
-
-    if (req) {
-      // Update the request in the store
-      req.status = newStatus;
-      req.updatedAt = new Date().toISOString();
-      if (decision === "REJECTED" && note) {
-        req.rejectionReason = note;
-      }
-      req.reviewNote = note || "";
-      req.reviewedAt = new Date().toISOString();
-    }
-
-    return NextResponse.json({
-      id,
-      status: newStatus,
-      decision,
-      note: note || "",
-      reviewedAt: new Date().toISOString(),
+    const { decision } = body; 
+    
+    const status = decision === "APPROVED" ? "PUBLISHED" : "REJECTED";
+    const { id } = await params;
+    
+    const updated = await prisma.request.update({
+      where: { id },
+      data: { status }
     });
+    
+    return NextResponse.json({ success: true, request: updated });
   } catch (error) {
-    console.error("Admin review error:", error);
-    return NextResponse.json({ error: "Review failed" }, { status: 500 });
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

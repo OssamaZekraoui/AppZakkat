@@ -24,7 +24,7 @@ export async function GET(
   }
 
   const { id } = await params;
-  const record = await prisma.zakatRecord.findFirst({ where: { id, userId } });
+  const record = await prisma.zakatCalculation.findFirst({ where: { id, userId } });
 
   if (!record) {
     return NextResponse.json({ success: false, error: "Record not found" }, { status: 404 });
@@ -43,12 +43,12 @@ export async function DELETE(
   }
 
   const { id } = await params;
-  const record = await prisma.zakatRecord.findFirst({ where: { id, userId } });
+  const record = await prisma.zakatCalculation.findFirst({ where: { id, userId } });
 
   if (!record) {
     return NextResponse.json({ success: false, error: "Record not found" }, { status: 404 });
   }
 
-  await prisma.zakatRecord.delete({ where: { id } });
+  await prisma.zakatCalculation.delete({ where: { id } });
   return NextResponse.json({ success: true, message: "Record deleted" });
 }

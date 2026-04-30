@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
 
-  const records = await prisma.zakatRecord.findMany({
+  const records = await prisma.zakatCalculation.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
   });
@@ -49,19 +49,20 @@ export async function POST(request: NextRequest) {
     const totalAssets = calculateTotalAssets({ goldValue, silverValue, cashValue, stocksValue });
     const zakatAmount = calculateZakat(totalAssets, nisabValue);
 
-    const record = await prisma.zakatRecord.create({
+    const record = await prisma.zakatCalculation.create({
       data: {
         userId,
-        year,
-        goldValue,
-        silverValue,
-        cashValue,
-        stocksValue,
-        totalAssets,
-        nisabValue,
+        goldPrice: 0,
+        silverPrice: 0,
+        currency: "MAD",
+        nisabType: "GOLD",
+        totalAssets: totalAssets,
+        debts: 0,
+        netAssets: totalAssets,
         zakatAmount,
-        currency,
-        notes,
+        hawlStart: new Date(),
+        hawlEnd: new Date(),
+        school: "MALIKI"
       },
     });
 

@@ -1,48 +1,53 @@
 import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
 
-// Shared reference to the in-memory store from /api/demandes
-// In production, both routes would use Prisma
-// For dev, we import the same store to keep data consistent
-import { getRequestsStore } from "@/lib/stores/requestsStore";
-
-// GET /api/admin/demandes — List all requests for admin
 export async function GET(request: NextRequest) {
   try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("auth_token")?.value;
+    if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { role: string };
+      if (decoded.role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    } catch {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
     const category = searchParams.get("category");
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "50");
 
-    const store = getRequestsStore();
-    let results = Object.values(store);
+    const where: any = {};
+    if (status) where.status = status;
+    if (category) where.category = category;
 
-    // Filter by status
-    if (status) {
-      results = results.filter(
-        (r) => (r as Record<string, unknown>).status === status
-      );
-    }
+    const [requests, total] = await Promise.all([
+      prisma.request.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * limit,
+        take: limit,
+        include: {
+          user: {
+            select: { name: true }
+          }
+        }
+      }),
+      prisma.request.count({ where })
+    ]);
 
-    // Filter by category
-    if (category) {
-      results = results.filter(
-        (r) => (r as Record<string, unknown>).category === category
-      );
-    }
-
-    // Sort by newest first
-    results.sort((a, b) => {
-      const dateA = new Date((a as Record<string, unknown>).createdAt as string).getTime();
-      const dateB = new Date((b as Record<string, unknown>).createdAt as string).getTime();
-      return dateB - dateA;
-    });
-
-    const total = results.length;
-    const paginated = results.slice((page - 1) * limit, page * limit);
+    const formatted = requests.map(req => ({
+      ...req,
+      displayName: req.user?.name || "Unknown",
+    }));
 
     return NextResponse.json({
-      requests: paginated,
+      requests: formatted,
       total,
       page,
       totalPages: Math.ceil(total / limit),

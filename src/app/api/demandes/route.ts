@@ -140,7 +140,7 @@ export async function GET(request: NextRequest) {
       descriptionAr: r.descriptionAr,
       targetAmount: Number(r.targetAmount),
       currentAmount: Number(r.currentAmount),
-      progressPercent: r.targetAmount > 0
+      progressPercent: Number(r.targetAmount) > 0
         ? Math.round((Number(r.currentAmount) / Number(r.targetAmount)) * 100)
         : 0,
       status: r.status,
