@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslations, useLocale } from "next-intl";
+import { useLocale } from "next-intl";
 import { useParams } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { CATEGORIES } from "@/types/demandes";
 import type { RequestVerificationSummary } from "@/types/verification";
 import AIVerificationPanel from "@/components/admin/AIVerificationPanel";
+import { adminText, getAdminLocale, labelFor, statusLabels, urgencyLabels } from "@/lib/adminText";
 
 interface AdminRequestDetail {
   id: string;
@@ -46,23 +47,24 @@ interface AdminRequestDetail {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  DRAFT: "bg-gray-100 text-gray-600",
-  SUBMITTED: "bg-blue-100 text-blue-700",
-  REVIEW: "bg-amber-100 text-amber-700",
-  PUBLISHED: "bg-emerald-100 text-emerald-700",
-  REJECTED: "bg-red-100 text-red-600",
-  CLOSED: "bg-gray-200 text-gray-500",
+  DRAFT: "bg-white text-green-deep border border-green-deep/12",
+  SUBMITTED: "bg-gold/20 text-green-deep border border-gold/35",
+  REVIEW: "bg-amber-50 text-amber-700 border border-amber-200",
+  PUBLISHED: "bg-green-pale/75 text-green-deep border border-green-light/20",
+  REJECTED: "bg-red-50 text-red-700 border border-red-200",
+  CLOSED: "bg-white text-green-deep/48 border border-green-deep/10",
 };
 
-const URGENCY_CONFIG: Record<string, { color: string; labelKey: string }> = {
-  NORMAL: { color: "bg-gray-100 text-gray-600", labelKey: "urgencyNormal" },
-  URGENT: { color: "bg-amber-100 text-amber-700", labelKey: "urgencyUrgent" },
-  CRITICAL: { color: "bg-red-100 text-red-700", labelKey: "urgencyCritical" },
+const URGENCY_CONFIG: Record<string, { color: string }> = {
+  NORMAL: { color: "bg-white text-green-deep border border-green-deep/12" },
+  URGENT: { color: "bg-amber-50 text-amber-700 border border-amber-200" },
+  CRITICAL: { color: "bg-red-50 text-red-700 border border-red-200" },
 };
 
 export default function AdminRequestReviewPage() {
-  const t = useTranslations("admin");
-  const locale = useLocale();
+  const rawLocale = useLocale();
+  const locale = getAdminLocale(rawLocale);
+  const t = adminText[locale];
   const isAr = locale === "ar";
   const params = useParams();
   const id = params.id as string;
@@ -137,12 +139,12 @@ export default function AdminRequestReviewPage() {
   if (!request) {
     return (
       <div className="text-center py-16">
-        <p className="font-cairo text-gray-400 text-lg">{t("notFound")}</p>
+        <p className="font-cairo text-green-deep/45 text-lg">{t.notFound}</p>
         <Link
           href="/admin/demandes"
           className="inline-block mt-4 text-gold hover:text-green-deep font-cairo text-sm"
         >
-          {t("backToList")}
+          {t.backToList}
         </Link>
       </div>
     );
@@ -157,31 +159,31 @@ export default function AdminRequestReviewPage() {
       <div className="flex items-center justify-between">
         <Link
           href="/admin/demandes"
-          className="text-gray-400 hover:text-green-deep font-cairo text-sm flex items-center gap-1"
+          className="inline-flex items-center gap-2 rounded-full border border-green-deep/10 bg-white px-4 py-2 font-cairo text-sm font-bold text-green-deep shadow-sm transition hover:border-gold/45 hover:bg-green-pale/35"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          {t("backToList")}
+          {t.backToList}
         </Link>
         <div className="flex items-center gap-2">
           {request.urgencyLevel && request.urgencyLevel !== "NORMAL" && (
             <span
               className={`text-[10px] font-bold font-cairo px-3 py-1 rounded-full ${urgency.color}`}
             >
-              {t(urgency.labelKey)}
+              {labelFor(urgencyLabels, request.urgencyLevel, locale)}
             </span>
           )}
           <span
             className={`text-xs font-bold font-cairo px-3 py-1 rounded-full ${STATUS_COLORS[request.status] || ""}`}
           >
-            {request.status}
+            {labelFor(statusLabels, request.status, locale)}
           </span>
         </div>
       </div>
 
       {/* Request summary */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-6">
+      <div className="bg-white rounded-3xl border border-green-deep/8 p-6 shadow-sm">
         <div className="flex items-center gap-3 mb-4">
           <span className="text-3xl">{cat?.icon}</span>
           <div className="flex-1">
@@ -198,7 +200,7 @@ export default function AdminRequestReviewPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
           <div>
             <p className="font-cairo text-[10px] text-gray-400 mb-0.5">
-              {t("reference")}
+              {t.reference}
             </p>
             <p className="font-lato text-sm font-bold text-green-deep">
               {request.referenceCode}
@@ -206,7 +208,7 @@ export default function AdminRequestReviewPage() {
           </div>
           <div>
             <p className="font-cairo text-[10px] text-gray-400 mb-0.5">
-              {t("amount")}
+              {t.amount}
             </p>
             <p className="font-lato text-sm font-bold text-green-deep" dir="ltr">
               {request.targetAmount?.toLocaleString()} {request.currency}
@@ -214,7 +216,7 @@ export default function AdminRequestReviewPage() {
           </div>
           <div>
             <p className="font-cairo text-[10px] text-gray-400 mb-0.5">
-              {t("location")}
+              {t.location}
             </p>
             <p className="font-cairo text-sm text-green-deep">
               {request.city}, {request.country}
@@ -222,10 +224,10 @@ export default function AdminRequestReviewPage() {
           </div>
           <div>
             <p className="font-cairo text-[10px] text-gray-400 mb-0.5">
-              {t("requester")}
+              {t.requester}
             </p>
             <p className="font-cairo text-sm text-green-deep">
-              {request.isAnonymous ? t("anonymous") : request.displayName}
+              {request.isAnonymous ? t.anonymous : request.displayName}
             </p>
           </div>
         </div>
@@ -233,7 +235,7 @@ export default function AdminRequestReviewPage() {
         {/* Submission date */}
         <div className="mb-4">
           <p className="font-cairo text-[10px] text-gray-400 mb-0.5">
-            {t("submittedAt")}
+            {t.submittedAt}
           </p>
           <p className="font-lato text-sm text-green-deep">
             {new Date(request.createdAt).toLocaleDateString(isAr ? "ar-MA" : "fr-FR", {
@@ -249,7 +251,7 @@ export default function AdminRequestReviewPage() {
         {/* Description */}
         <div className="border-t border-gray-100 pt-4">
           <p className="font-cairo text-[10px] text-gray-400 mb-1">
-            {t("description")}
+            {t.description}
           </p>
           <p className="font-cairo text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
             {request.descriptionAr}
@@ -265,7 +267,7 @@ export default function AdminRequestReviewPage() {
         {request.breakdown && request.breakdown.length > 0 && (
           <div className="border-t border-gray-100 pt-4 mt-4">
             <p className="font-cairo text-[10px] text-gray-400 mb-2">
-              {t("breakdown")}
+              {t.breakdown}
             </p>
             <div className="space-y-1.5">
               {request.breakdown.map((item, i) => (
@@ -281,7 +283,7 @@ export default function AdminRequestReviewPage() {
               ))}
               <div className="flex items-center justify-between bg-green-deep/5 rounded-lg px-3 py-2 border border-green-deep/10">
                 <span className="font-cairo text-xs font-bold text-green-deep">
-                  {t("total")}
+                  {t.total}
                 </span>
                 <span className="font-lato text-sm font-bold text-green-deep" dir="ltr">
                   {request.targetAmount.toLocaleString()} {request.currency}
@@ -294,7 +296,7 @@ export default function AdminRequestReviewPage() {
         {/* Contact info */}
         <div className="border-t border-gray-100 pt-4 mt-4">
           <p className="font-cairo text-[10px] text-gray-400 mb-2">
-            {t("bankingInfo")}
+            {t.bankingInfo}
           </p>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -311,20 +313,20 @@ export default function AdminRequestReviewPage() {
             </div>
             <div>
               <span className="text-[10px] text-gray-400 font-cairo">
-                {t("bank")}
+                {t.bank}
               </span>
               <p className="font-cairo text-xs text-green-deep">{request.bankName}</p>
             </div>
             <div>
               <span className="text-[10px] text-gray-400 font-cairo">
-                {t("email")}
+                {t.email}
               </span>
               <p className="font-lato text-xs text-green-deep">{request.contactEmail}</p>
             </div>
             {request.contactPhone && (
               <div>
                 <span className="text-[10px] text-gray-400 font-cairo">
-                  {t("phone")}
+                  {t.phone}
                 </span>
                 <p className="font-lato text-xs text-green-deep" dir="ltr">
                   {request.contactPhone}
@@ -338,7 +340,7 @@ export default function AdminRequestReviewPage() {
         {request.documents && request.documents.length > 0 && (
           <div className="border-t border-gray-100 pt-4 mt-4">
             <p className="font-cairo text-[10px] text-gray-400 mb-2">
-              {t("documents")} ({request.documents.length})
+              {t.documents} ({request.documents.length})
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {request.documents.map((doc) => (
@@ -387,12 +389,12 @@ export default function AdminRequestReviewPage() {
       {(request.status === "SUBMITTED" || request.status === "REVIEW") && !reviewResult && (
         <div className="bg-white rounded-2xl border border-gray-100 p-6">
           <h3 className="font-amiri text-lg font-bold text-green-deep mb-4">
-            {t("reviewDecision")}
+            {t.reviewDecision}
           </h3>
           <textarea
             value={reviewNote}
             onChange={(e) => setReviewNote(e.target.value)}
-            placeholder={t("reviewNotesPlaceholder")}
+            placeholder={t.reviewNotesPlaceholder}
             className="w-full rounded-xl border border-gray-200 p-4 font-cairo text-sm text-green-deep resize-none h-24 focus:outline-none focus:border-gold/50 mb-4"
           />
           <div className="flex items-center gap-3">
@@ -404,7 +406,7 @@ export default function AdminRequestReviewPage() {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              {t("approve")}
+              {t.approve}
             </button>
             <button
               onClick={() => handleReview("REJECTED")}
@@ -414,7 +416,7 @@ export default function AdminRequestReviewPage() {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
-              {t("reject")}
+              {t.reject}
             </button>
           </div>
         </div>
@@ -447,13 +449,13 @@ export default function AdminRequestReviewPage() {
               reviewResult === "APPROVED" ? "text-emerald-700" : "text-red-600"
             }`}
           >
-            {reviewResult === "APPROVED" ? t("approved") : t("rejected")}
+            {reviewResult === "APPROVED" ? t.approved : t.rejected}
           </p>
           <Link
             href="/admin/demandes"
             className="inline-block mt-3 text-sm font-cairo text-gray-400 hover:text-green-deep transition-colors"
           >
-            {t("backToList")}
+            {t.backToList}
           </Link>
         </div>
       )}

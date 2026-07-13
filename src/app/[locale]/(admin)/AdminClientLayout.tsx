@@ -1,115 +1,119 @@
 "use client";
 
-import { useTranslations, useLocale } from "next-intl";
+import { useLocale } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
+import { adminText, getAdminLocale } from "@/lib/adminText";
+
+function Icon({ name }: { name: "home" | "requests" | "donations" | "users" | "back" }) {
+  const paths = {
+    home: "M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10",
+    requests: "M7 4h7l4 4v12H7V4zm7 0v5h5M9 13h6M9 17h6",
+    donations: "M12 21s-7-4.35-7-10a4 4 0 017-2.65A4 4 0 0119 11c0 5.65-7 10-7 10z",
+    users: "M16 11a4 4 0 10-8 0M4 21a8 8 0 0116 0M20 8a3 3 0 00-3-3M4 8a3 3 0 013-3",
+    back: "M19 12H5m0 0l6-6m-6 6l6 6",
+  };
+
+  return (
+    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={paths[name]} />
+    </svg>
+  );
+}
 
 export function AdminClientLayout({ children }: { children: React.ReactNode }) {
-  const t = useTranslations("admin");
   const locale = useLocale();
   const pathname = usePathname();
-  const isAr = locale === "ar";
+  const currentLocale = getAdminLocale(locale);
+  const t = adminText[currentLocale];
+  const isAr = currentLocale === "ar";
 
   const navItems = [
-    {
-      href: "/admin",
-      label: t("adminPanel") || "Dashboard",
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-        </svg>
-      ),
-    },
-    {
-      href: "/admin/demandes",
-      label: t("requests"),
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      ),
-    },
-    {
-      href: "/admin/donations",
-      label: "Donations",
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
-    },
-    {
-      href: "/admin/users",
-      label: "Users",
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-        </svg>
-      ),
-    },
+    { href: "/admin", label: t.dashboard, icon: "home" as const },
+    { href: "/admin/demandes", label: t.requests, icon: "requests" as const },
+    { href: "/admin/donations", label: t.donations, icon: "donations" as const },
+    { href: "/admin/users", label: t.users, icon: "users" as const },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex" dir={isAr ? "rtl" : "ltr"}>
-      {/* Sidebar */}
-      <aside className="w-64 bg-green-deep text-white flex-shrink-0 hidden md:flex flex-col">
-        <div className="p-6 border-b border-white/10">
-          <Link href="/" className="block">
-            <span className="text-gold font-amiri text-2xl font-bold">
-              {isAr ? "ضياء" : "Diyae"}
+    <div className="min-h-screen bg-white-off text-green-deep" dir={isAr ? "rtl" : "ltr"}>
+      <aside className="fixed inset-y-0 z-40 hidden w-72 flex-col overflow-hidden bg-green-deep text-white md:flex">
+        <div className="absolute inset-0 islamic-pattern opacity-20" />
+        <div className="relative border-b border-gold/20 p-6">
+          <Link href="/" className="group inline-block">
+            <span className="block font-amiri text-4xl font-bold leading-none text-gold drop-shadow-[0_0_14px_rgba(201,168,76,0.25)]">
+              {t.brand}
             </span>
-            <span className="block text-white/50 text-xs font-cairo mt-1">
-              {t("adminPanel")}
+            <span className="mt-2 block font-cairo text-xs font-bold text-white/58">
+              {t.adminPanel}
             </span>
           </Link>
         </div>
-        <nav className="flex-1 p-4 space-y-1">
+
+        <nav className="relative flex-1 space-y-2 p-4">
           {navItems.map((item) => {
-            const isActive = pathname?.startsWith(item.href);
+            const isActive =
+              item.href === "/admin"
+                ? pathname === item.href
+                : Boolean(pathname?.startsWith(item.href));
+
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-cairo transition-colors ${
+                className={`flex items-center gap-3 rounded-2xl px-4 py-3 font-cairo text-sm font-bold transition ${
                   isActive
-                    ? "bg-gold/20 text-gold font-bold"
-                    : "text-white/70 hover:text-white hover:bg-white/5"
+                    ? "bg-gold text-green-deep shadow-lg shadow-gold/15"
+                    : "text-white/72 hover:bg-white/8 hover:text-white"
                 }`}
               >
-                {item.icon}
-                {item.label}
+                <Icon name={item.icon} />
+                <span>{item.label}</span>
               </Link>
             );
           })}
         </nav>
-        <div className="p-4 border-t border-white/10">
+
+        <div className="relative border-t border-gold/20 p-4">
           <Link
             href="/"
-            className="flex items-center gap-2 text-white/50 hover:text-white text-xs font-cairo transition-colors"
+            className="flex items-center gap-2 rounded-2xl px-4 py-3 font-cairo text-sm font-bold text-white/62 transition hover:bg-white/8 hover:text-white"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            {t("backToSite")}
+            <Icon name="back" />
+            <span>{t.backToSite}</span>
           </Link>
         </div>
       </aside>
 
-      {/* Main content */}
-      <main className="flex-1 overflow-auto">
-        {/* Mobile header */}
-        <div className="md:hidden bg-green-deep text-white p-4 flex items-center justify-between">
-          <span className="text-gold font-amiri text-xl font-bold">
-            {isAr ? "ضياء" : "Diyae"} — {t("adminPanel")}
-          </span>
-          <Link
-            href="/"
-            className="text-white/50 hover:text-white text-xs font-cairo"
-          >
-            {t("backToSite")}
-          </Link>
-        </div>
-        <div className="p-6 md:p-8">{children}</div>
-      </main>
+      <div className="md:ps-72">
+        <header className="sticky top-0 z-30 border-b border-green-deep/8 bg-white-off/92 px-4 py-3 backdrop-blur md:hidden">
+          <div className="flex items-center justify-between gap-4">
+            <Link href="/admin" className="font-amiri text-2xl font-bold text-green-deep">
+              {t.brand}
+            </Link>
+            <Link
+              href="/"
+              className="rounded-full border border-green-deep/10 bg-white px-4 py-2 font-cairo text-xs font-bold text-green-deep shadow-sm"
+            >
+              {t.backToSite}
+            </Link>
+          </div>
+          <nav className="mt-3 flex gap-2 overflow-x-auto pb-1">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="whitespace-nowrap rounded-full bg-white px-4 py-2 font-cairo text-xs font-bold text-green-deep shadow-sm"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        </header>
+
+        <main className="min-h-screen px-4 py-6 md:px-8 lg:px-10">
+          <div className="mx-auto max-w-7xl">{children}</div>
+        </main>
+      </div>
     </div>
   );
 }
