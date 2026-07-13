@@ -21,6 +21,7 @@ type AuthResponse = {
       id: string;
       email: string;
       name: string | null;
+      role?: "USER" | "ADMIN";
     };
   };
 };
@@ -152,7 +153,7 @@ export default function AuthForm({ mode, locale }: AuthFormProps) {
 
     localStorage.setItem(AUTH_TOKEN_KEY, result.data.token);
     localStorage.setItem(AUTH_USER_KEY, JSON.stringify(result.data.user));
-    router.push("/");
+    router.push(result.data.user.role === "ADMIN" ? "/admin" : "/");
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
