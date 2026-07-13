@@ -36,13 +36,45 @@ export function CrescentMoon({ className = "" }: { className?: string }) {
   return (
     <svg
       className={className}
-      viewBox="0 0 100 100"
+      viewBox="0 0 120 120"
       xmlns="http://www.w3.org/2000/svg"
-      fill="currentColor"
+      fill="none"
     >
-      <path d="M50 5C28.5 5 11 22.5 11 44s17.5 39 39 39c8.5 0 16.5-2.7 23-7.4C64 82.3 52.7 88 40 88 18 88 0 70 0 48S18 8 40 8c4 0 7.8.6 11.4 1.6C50.3 7 50 5 50 5z" />
-      {/* Star */}
-      <circle cx="70" cy="20" r="3" />
+      <defs>
+        <mask id="hilal-cutout">
+          <rect width="120" height="120" fill="white" />
+          <circle cx="66" cy="54" r="45" fill="black" />
+        </mask>
+      </defs>
+      <circle cx="50" cy="60" r="45" fill="currentColor" mask="url(#hilal-cutout)" />
+      <path
+        d="M78 40l4.8 13.2 13.7.4-10.8 8.4 3.9 13.1L78 67.8l-11.6 7.3 3.9-13.1-10.8-8.4 13.7-.4L78 40Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+export function Moon({ className = "" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 120 120"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+    >
+      <circle cx="60" cy="60" r="38" fill="currentColor" opacity="0.9" />
+      <circle cx="46" cy="46" r="7" fill="#1A472A" opacity="0.18" />
+      <circle cx="72" cy="42" r="4" fill="#1A472A" opacity="0.14" />
+      <circle cx="77" cy="70" r="8" fill="#1A472A" opacity="0.12" />
+      <circle cx="52" cy="76" r="5" fill="#1A472A" opacity="0.13" />
+      <path
+        d="M33 63C38 81 55 92 74 87"
+        stroke="#1A472A"
+        strokeWidth="3"
+        strokeLinecap="round"
+        opacity="0.08"
+      />
     </svg>
   );
 }

@@ -22,6 +22,7 @@ import Step4Stock from "./steps/Step4Stock";
 import Step5Receivables from "./steps/Step5Receivables";
 import Step6Debts from "./steps/Step6Debts";
 import Step7Results from "./steps/Step7Results";
+import { pickText } from "./zakatText";
 
 const TOTAL_STEPS = 8;
 const STORAGE_KEY = "diyae-zakat-draft";
@@ -55,7 +56,6 @@ interface ZakatWizardProps {
 }
 
 export default function ZakatWizard({ locale }: ZakatWizardProps) {
-  const isAr = locale === "ar";
   const [state, setState] = useState<WizardState>(getInitialState);
 
   // Load draft from localStorage
@@ -270,7 +270,11 @@ export default function ZakatWizard({ locale }: ZakatWizardProps) {
                 className="px-6 py-3 rounded-xl border-2 border-green-deep/10 text-green-deep font-cairo font-bold
                            hover:border-green-deep/20 transition-colors"
               >
-                {isAr ? "→ السابق" : "← Précédent"}
+                {pickText(locale, {
+                  ar: "→ السابق",
+                  fr: "← Précédent",
+                  en: "← Previous",
+                })}
               </button>
             ) : (
               <div />
@@ -282,12 +286,16 @@ export default function ZakatWizard({ locale }: ZakatWizardProps) {
                          hover:bg-gold-light shadow-lg hover:shadow-xl transition-all"
             >
               {state.currentStep === 6
-                ? isAr
-                  ? "احسب الزكاة"
-                  : "Calculer la Zakat"
-                : isAr
-                ? "التالي ←"
-                : "Suivant →"}
+                ? pickText(locale, {
+                    ar: "احسب الزكاة",
+                    fr: "Calculer la Zakat",
+                    en: "Calculate Zakat",
+                  })
+                : pickText(locale, {
+                    ar: "التالي ←",
+                    fr: "Suivant →",
+                    en: "Next →",
+                  })}
             </button>
           </div>
         )}

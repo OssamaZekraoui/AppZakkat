@@ -40,6 +40,11 @@ body {
   background-repeat: repeat;
 }
 
+/* Hero stats */
+.stat-card {
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
 /* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;

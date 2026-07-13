@@ -1,6 +1,7 @@
 "use client";
 
 import type { MetalPrices, Currency } from "@/lib/zakat/types";
+import { numberLocale, pickText } from "../zakatText";
 
 interface NisabCardProps {
   metalPrices: MetalPrices | null;
@@ -27,20 +28,19 @@ export default function NisabCard({
   const rate = exchangeRates[currency] || 1;
   const goldNisab = 85 * metalPrices.goldPerGram * rate;
   const silverNisab = 595 * metalPrices.silverPerGram * rate;
-  const isAr = locale === "ar";
 
   const formatPrice = (n: number) =>
-    n.toLocaleString(isAr ? "ar-MA" : "fr-FR", {
+    n.toLocaleString(numberLocale(locale), {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
 
   const sourceLabel =
     metalPrices.source === "live"
-      ? isAr ? "مباشر" : "Live"
+      ? pickText(locale, { ar: "مباشر", fr: "Live", en: "Live" })
       : metalPrices.source === "cached"
-      ? isAr ? "مخزن مؤقتاً" : "Cache"
-      : isAr ? "احتياطي" : "Fallback";
+      ? pickText(locale, { ar: "مخزن مؤقتاً", fr: "Cache", en: "Cached" })
+      : pickText(locale, { ar: "احتياطي", fr: "Fallback", en: "Fallback" });
 
   const sourceColor =
     metalPrices.source === "live"
@@ -53,7 +53,7 @@ export default function NisabCard({
     <div className="bg-gradient-to-br from-green-pale/40 to-white rounded-2xl p-5 border border-green-deep/10">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-cairo font-bold text-green-deep">
-          {isAr ? "النصاب" : "Nisab"}
+          {pickText(locale, { ar: "النصاب", fr: "Nisab", en: "Nisab" })}
         </h3>
         <span
           className={`${sourceColor} text-white text-[10px] font-bold px-2 py-0.5 rounded-full`}
@@ -63,12 +63,11 @@ export default function NisabCard({
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        {/* Gold */}
         <div className="bg-white rounded-xl p-3 border border-gold/20">
           <div className="flex items-center gap-1.5 mb-1">
             <span className="text-lg">🥇</span>
             <span className="text-xs font-cairo text-green-deep/60">
-              {isAr ? "ذهب" : "Or"} (85g)
+              {pickText(locale, { ar: "ذهب", fr: "Or", en: "Gold" })} (85g)
             </span>
           </div>
           <p className="font-lato font-bold text-green-deep text-sm" dir="ltr">
@@ -79,12 +78,11 @@ export default function NisabCard({
           </p>
         </div>
 
-        {/* Silver */}
         <div className="bg-white rounded-xl p-3 border border-green-deep/10">
           <div className="flex items-center gap-1.5 mb-1">
             <span className="text-lg">🥈</span>
             <span className="text-xs font-cairo text-green-deep/60">
-              {isAr ? "فضة" : "Argent"} (595g)
+              {pickText(locale, { ar: "فضة", fr: "Argent", en: "Silver" })} (595g)
             </span>
           </div>
           <p className="font-lato font-bold text-green-deep text-sm" dir="ltr">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { useState } from "react";
 
 const GOLD_PRICE_DEFAULT = 850; // MAD per gram (approximate)
@@ -57,12 +58,12 @@ export default function ZakatTeaser() {
               )}
             </ul>
 
-            <a
+            <Link
               href="/zakat"
               className="inline-block px-8 py-3 bg-gold hover:bg-gold-light text-green-deep font-cairo font-bold rounded-xl transition-all min-h-[44px]"
             >
               {t("fullCalculator")}
-            </a>
+            </Link>
           </div>
 
           {/* Right: Quick calc widget */}

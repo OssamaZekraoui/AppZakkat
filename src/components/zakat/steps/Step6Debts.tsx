@@ -2,6 +2,7 @@
 
 import type { Currency, ZakatAssets } from "@/lib/zakat/types";
 import AssetInput from "../ui/AssetInput";
+import { numberLocale, pickText } from "../zakatText";
 
 interface Step6Props {
   assets: ZakatAssets;
@@ -20,9 +21,6 @@ export default function Step6Debts({
   onHawlStartChange,
   locale,
 }: Step6Props) {
-  const isAr = locale === "ar";
-
-  // Calculate hawl end (354 lunar days)
   let hawlEndStr = "";
   let daysLeft = 0;
   let hawlCompleted = false;
@@ -31,7 +29,7 @@ export default function Step6Debts({
     const start = new Date(hawlStart);
     const end = new Date(start);
     end.setDate(end.getDate() + 354);
-    hawlEndStr = end.toLocaleDateString(isAr ? "ar-MA" : "fr-FR");
+    hawlEndStr = end.toLocaleDateString(numberLocale(locale));
 
     const today = new Date();
     const diff = Math.floor(
@@ -41,14 +39,13 @@ export default function Step6Debts({
     daysLeft = hawlCompleted ? 0 : 354 - diff;
   }
 
-  // Hijri date display
   let hijriDate = "";
   if (hawlStart) {
     try {
       const start = new Date(hawlStart);
       const end = new Date(start);
       end.setDate(end.getDate() + 354);
-      hijriDate = end.toLocaleDateString(isAr ? "ar-SA" : "fr-FR", {
+      hijriDate = end.toLocaleDateString(locale === "ar" ? "ar-SA" : numberLocale(locale), {
         calendar: "islamic",
         year: "numeric",
         month: "long",
@@ -63,13 +60,14 @@ export default function Step6Debts({
     <div className="space-y-6">
       <div className="text-center mb-2">
         <h2 className="font-amiri text-2xl font-bold text-green-deep">
-          {isAr ? "الديون والخصومات" : "Dettes et déductions"}
+          {pickText(locale, { ar: "الديون والخصومات", fr: "Dettes et déductions", en: "Debts and deductions" })}
         </h2>
       </div>
 
       <div className="space-y-4">
         <AssetInput
           label="Short-term debts"
+          labelFr="Dettes à court terme"
           labelAr="ديون قصيرة الأجل (أقل من سنة)"
           icon="📉"
           value={assets.shortTermDebts}
@@ -79,24 +77,24 @@ export default function Step6Debts({
         />
         <AssetInput
           label="Essential expenses"
+          labelFr="Dépenses essentielles"
           labelAr="مصاريف أساسية فورية"
           icon="🏠"
           value={assets.essentialExpenses}
           onChange={(v) => onUpdate("essentialExpenses", v)}
           suffix={currency}
           locale={locale}
-          hint={
-            isAr
-              ? "إيجار، طعام، فواتير مستحقة..."
-              : "Loyer, nourriture, factures dues..."
-          }
+          hint={pickText(locale, {
+            ar: "إيجار، طعام، فواتير مستحقة...",
+            fr: "Loyer, nourriture, factures dues...",
+            en: "Rent, food, due bills...",
+          })}
         />
       </div>
 
-      {/* Hawl date */}
       <div className="border-t border-green-deep/10 pt-6">
         <label className="block font-cairo font-bold text-green-deep mb-2">
-          {isAr ? "تاريخ بداية الحول" : "Date de début du Hawl"}
+          {pickText(locale, { ar: "تاريخ بداية الحول", fr: "Date de début du Hawl", en: "Hawl start date" })}
         </label>
         <input
           type="date"
@@ -117,8 +115,12 @@ export default function Step6Debts({
               }`}
             >
               <p className="font-cairo text-sm text-green-deep">
-                {isAr ? "يكتمل الحول في" : "Le Hawl se complète le"} :{" "}
-                <span className="font-bold">{hawlEndStr}</span>
+                {pickText(locale, {
+                  ar: "يكتمل الحول في",
+                  fr: "Le Hawl se complète le",
+                  en: "Hawl completes on",
+                })}{" "}
+                : <span className="font-bold">{hawlEndStr}</span>
               </p>
               {hijriDate && (
                 <p className="font-cairo text-xs text-green-deep/50 mt-1">
@@ -127,13 +129,19 @@ export default function Step6Debts({
               )}
               {hawlCompleted ? (
                 <p className="font-cairo text-sm text-green-medium font-bold mt-2">
-                  {isAr ? "✓ الحول مكتمل" : "✓ Le Hawl est complété"}
+                  {pickText(locale, {
+                    ar: "✓ الحول مكتمل",
+                    fr: "✓ Le Hawl est complété",
+                    en: "✓ Hawl is complete",
+                  })}
                 </p>
               ) : (
                 <p className="font-cairo text-sm text-orange-600 mt-2">
-                  {isAr
-                    ? `⏳ ${daysLeft.toLocaleString("ar-MA")} يوماً متبقياً`
-                    : `⏳ ${daysLeft} jours restants`}
+                  {pickText(locale, {
+                    ar: `⏳ ${daysLeft.toLocaleString("ar-MA")} يوماً متبقياً`,
+                    fr: `⏳ ${daysLeft} jours restants`,
+                    en: `⏳ ${daysLeft} days remaining`,
+                  })}
                 </p>
               )}
             </div>

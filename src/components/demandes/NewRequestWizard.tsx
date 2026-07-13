@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useRouter } from "@/i18n/navigation";
 import type { RequestFormData, RequestCategory } from "@/types/demandes";
 import { DEFAULT_FORM_DATA } from "@/types/demandes";
 import { validateStep } from "@/lib/validations/demande";
@@ -16,6 +17,7 @@ import Step6Review from "./steps/Step6Review";
 
 const TOTAL_STEPS = 7;
 const STORAGE_KEY = "diyae-request-draft";
+const AUTH_TOKEN_KEY = "diyae-auth-token";
 const AUTO_SAVE_INTERVAL = 30_000; // 30s
 
 const STEP_LABELS_AR = ["الفئة", "الهوية", "الوضع", "المبلغ", "البنك", "الوثائق", "المراجعة"];
@@ -26,6 +28,7 @@ interface NewRequestWizardProps {
 }
 
 export default function NewRequestWizard({ locale }: NewRequestWizardProps) {
+  const router = useRouter();
   const isAr = locale === "ar";
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState<Partial<RequestFormData>>({ ...DEFAULT_FORM_DATA });
@@ -111,9 +114,24 @@ export default function NewRequestWizard({ locale }: NewRequestWizardProps) {
 
     setIsSubmitting(true);
     try {
+      const token = localStorage.getItem(AUTH_TOKEN_KEY);
+
+      if (!token) {
+        setErrors({
+          submit: isAr
+            ? "يجب تسجيل الدخول لإرسال الطلب"
+            : "Vous devez vous connecter pour soumettre une demande",
+        });
+        router.push("/login");
+        return;
+      }
+
       const res = await fetch("/api/demandes", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ ...formData, status: "SUBMITTED", documentVerifications }),
       });
 
@@ -122,6 +140,14 @@ export default function NewRequestWizard({ locale }: NewRequestWizardProps) {
         setReferenceCode(data.referenceCode || "DY-2026-0001");
         setSubmitted(true);
         localStorage.removeItem(STORAGE_KEY);
+      } else if (res.status === 401) {
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+        setErrors({
+          submit: isAr
+            ? "انتهت الجلسة، سجل الدخول من جديد"
+            : "Votre session a expiré, reconnectez-vous",
+        });
+        router.push("/login");
       } else {
         setErrors({ submit: isAr ? "فشل الإرسال — حاول مجدداً" : "Échec — réessayez" });
       }

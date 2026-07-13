@@ -15,15 +15,23 @@ function getUserIdFromRequest(request: NextRequest): string | null {
   }
 }
 
+function getHawlDates(year: number) {
+  const hawlStart = new Date(Date.UTC(year, 0, 1));
+  const hawlEnd = new Date(hawlStart);
+  hawlEnd.setUTCDate(hawlEnd.getUTCDate() + 354);
+  return { hawlStart, hawlEnd };
+}
+
 export async function GET(request: NextRequest) {
   const userId = getUserIdFromRequest(request);
   if (!userId) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
 
-  const records = await prisma.zakatRecord.findMany({
+  const records = await prisma.zakatCalculation.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
+    include: { items: true },
   });
 
   return NextResponse.json({ success: true, data: records });
@@ -37,7 +45,16 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { goldValue = 0, silverValue = 0, cashValue = 0, stocksValue = 0, nisabValue, year, currency = "DZD", notes } = body;
+    const {
+      goldValue = 0,
+      silverValue = 0,
+      cashValue = 0,
+      stocksValue = 0,
+      debts = 0,
+      nisabValue,
+      year,
+      currency = "MAD",
+    } = body;
 
     if (!nisabValue || !year) {
       return NextResponse.json(
@@ -47,26 +64,31 @@ export async function POST(request: NextRequest) {
     }
 
     const totalAssets = calculateTotalAssets({ goldValue, silverValue, cashValue, stocksValue });
-    const zakatAmount = calculateZakat(totalAssets, nisabValue);
+    const netAssets = Math.max(0, totalAssets - Number(debts));
+    const zakatAmount = calculateZakat(netAssets, Number(nisabValue));
+    const { hawlStart, hawlEnd } = getHawlDates(Number(year));
 
-    const record = await prisma.zakatRecord.create({
+    const record = await prisma.zakatCalculation.create({
       data: {
         userId,
-        year,
-        goldValue,
-        silverValue,
-        cashValue,
-        stocksValue,
-        totalAssets,
-        nisabValue,
-        zakatAmount,
         currency,
-        notes,
+        nisabType: "GOLD",
+        goldPrice: goldValue,
+        silverPrice: silverValue,
+        totalAssets,
+        debts,
+        netAssets,
+        zakatAmount,
+        hawlStart,
+        hawlEnd,
+        school: "MALIKI",
       },
+      include: { items: true },
     });
 
     return NextResponse.json({ success: true, data: record }, { status: 201 });
-  } catch {
+  } catch (error) {
+    console.error("Create zakat calculation error:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
       { status: 500 }

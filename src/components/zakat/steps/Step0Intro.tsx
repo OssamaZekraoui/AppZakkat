@@ -4,6 +4,7 @@ import type { Currency, MetalPrices, ZakatSchool } from "@/lib/zakat/types";
 import NisabCard from "../ui/NisabCard";
 import SchoolSelector from "../ui/SchoolSelector";
 import CurrencySelector from "../ui/CurrencySelector";
+import { pickText } from "../zakatText";
 
 interface Step0Props {
   currency: Currency;
@@ -24,33 +25,38 @@ export default function Step0Intro({
   exchangeRates,
   locale,
 }: Step0Props) {
-  const isAr = locale === "ar";
-
   return (
     <div className="space-y-8">
-      {/* Title */}
       <div className="text-center">
         <h2 className="font-amiri text-3xl md:text-4xl font-bold text-green-deep mb-2">
-          {isAr ? "حاسبة الزكاة الشاملة" : "Calculateur de Zakat complet"}
+          {pickText(locale, {
+            ar: "حاسبة الزكاة الشاملة",
+            fr: "Calculateur de Zakat complet",
+            en: "Complete Zakat calculator",
+          })}
         </h2>
         <p className="font-cairo text-green-deep/60">
-          {isAr
-            ? "احسب زكاتك بدقة وفق المذاهب الفقهية الأربعة"
-            : "Calculez votre Zakat avec précision selon les 4 écoles juridiques"}
+          {pickText(locale, {
+            ar: "احسب زكاتك بدقة وفق المذاهب الفقهية الأربعة",
+            fr: "Calculez votre Zakat avec précision selon les quatre écoles juridiques",
+            en: "Calculate your Zakat accurately according to the four schools of jurisprudence",
+          })}
         </p>
       </div>
 
-      {/* Quranic verse */}
       <div className="bg-green-pale/30 rounded-2xl p-6 border border-green-deep/10 text-center">
         <p className="font-amiri text-xl text-green-deep leading-relaxed mb-2">
           خُذْ مِنْ أَمْوَالِهِمْ صَدَقَةً تُطَهِّرُهُمْ وَتُزَكِّيهِم بِهَا
         </p>
         <p className="font-cairo text-sm text-green-deep/50">
-          {isAr ? "التوبة : ١٠٣" : "At-Tawbah : 103"}
+          {pickText(locale, {
+            ar: "التوبة : ١٠٣",
+            fr: "At-Tawbah : 103",
+            en: "At-Tawbah: 103",
+          })}
         </p>
       </div>
 
-      {/* Nisab card */}
       <NisabCard
         metalPrices={metalPrices}
         currency={currency}
@@ -58,18 +64,24 @@ export default function Step0Intro({
         locale={locale}
       />
 
-      {/* Currency */}
       <div>
         <label className="block font-cairo font-bold text-green-deep mb-3">
-          {isAr ? "العملة" : "Devise"}
+          {pickText(locale, {
+            ar: "العملة",
+            fr: "Devise",
+            en: "Currency",
+          })}
         </label>
         <CurrencySelector value={currency} onChange={onCurrencyChange} />
       </div>
 
-      {/* School */}
       <div>
         <label className="block font-cairo font-bold text-green-deep mb-3">
-          {isAr ? "المذهب الفقهي" : "École juridique"}
+          {pickText(locale, {
+            ar: "المذهب الفقهي",
+            fr: "École juridique",
+            en: "Jurisprudence school",
+          })}
         </label>
         <SchoolSelector
           value={school}
@@ -78,11 +90,12 @@ export default function Step0Intro({
         />
       </div>
 
-      {/* Disclaimer */}
       <p className="text-center text-xs text-green-deep/40 font-cairo">
-        {isAr
-          ? "هذا الحساب تقديري — استشر عالماً للتأكد"
-          : "Ce calcul est indicatif — consultez un savant pour confirmation"}
+        {pickText(locale, {
+          ar: "هذا الحساب تقديري — استشر عالماً للتأكد",
+          fr: "Ce calcul est indicatif — consultez un savant pour confirmation",
+          en: "This calculation is indicative — consult a scholar for confirmation",
+        })}
       </p>
     </div>
   );

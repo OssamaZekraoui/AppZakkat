@@ -2,7 +2,10 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+const AUTH_TOKEN_KEY = "diyae-auth-token";
+const AUTH_USER_KEY = "diyae-auth-user";
 
 const localeLabels: Record<string, string> = {
   ar: "ع",
@@ -15,6 +18,18 @@ export default function Navbar() {
   const locale = useLocale();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    setIsAuthenticated(Boolean(localStorage.getItem(AUTH_TOKEN_KEY)));
+  }, []);
+
+  function handleLogout() {
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    localStorage.removeItem(AUTH_USER_KEY);
+    setIsAuthenticated(false);
+    setMobileOpen(false);
+  }
 
   const navLinks = [
     { href: "/demandes", label: t("requests"), isRoute: true },
@@ -76,6 +91,33 @@ export default function Navbar() {
 
           {/* Language switcher + mobile menu */}
           <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-2">
+              {isAuthenticated ? (
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="rounded-full border border-gold/35 px-4 py-2 font-cairo text-sm font-bold text-white transition hover:bg-white/10"
+                >
+                  {t("logout")}
+                </button>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="rounded-full px-4 py-2 font-cairo text-sm font-bold text-white/82 transition hover:text-white"
+                  >
+                    {t("login")}
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="rounded-full bg-gold px-4 py-2 font-cairo text-sm font-black text-green-deep shadow-sm transition hover:bg-gold-light"
+                  >
+                    {t("register")}
+                  </Link>
+                </>
+              )}
+            </div>
+
             {/* Language switcher */}
             <div className="flex items-center gap-1 bg-white/10 rounded-full px-1 py-0.5">
               {(["ar", "fr", "en"] as const).map((loc) => (
@@ -158,6 +200,35 @@ export default function Navbar() {
           >
             {t("supportSite")}
           </a>
+
+          <div className="border-t border-gold/15 pt-3">
+            {isAuthenticated ? (
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="w-full rounded-xl border border-gold/35 px-4 py-3 text-center font-cairo font-bold text-white"
+              >
+                {t("logout")}
+              </button>
+            ) : (
+              <div className="grid grid-cols-2 gap-2">
+                <Link
+                  href="/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-xl border border-white/15 px-4 py-3 text-center font-cairo font-bold text-white"
+                >
+                  {t("login")}
+                </Link>
+                <Link
+                  href="/register"
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-xl bg-gold px-4 py-3 text-center font-cairo font-black text-green-deep"
+                >
+                  {t("register")}
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </nav>

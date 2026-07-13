@@ -1,26 +1,12 @@
 "use client";
 
-const STEP_LABELS_AR = [
-  "الإعداد",
-  "السيولة",
-  "المعادن",
-  "الاستثمار",
-  "التجارة",
-  "الإيرادات",
-  "الديون",
-  "النتائج",
-];
+import { getZakatLocale } from "../zakatText";
 
-const STEP_LABELS_FR = [
-  "Config",
-  "Liquidités",
-  "Métaux",
-  "Investir",
-  "Commerce",
-  "Revenus",
-  "Dettes",
-  "Résultats",
-];
+const STEP_LABELS = {
+  ar: ["الإعداد", "السيولة", "المعادن", "الاستثمار", "التجارة", "الإيرادات", "الديون", "النتائج"],
+  fr: ["Config", "Liquidités", "Métaux", "Investir", "Commerce", "Revenus", "Dettes", "Résultats"],
+  en: ["Setup", "Cash", "Metals", "Investments", "Trade", "Income", "Debts", "Results"],
+};
 
 interface StepIndicatorProps {
   currentStep: number;
@@ -33,11 +19,11 @@ export default function StepIndicator({
   totalSteps,
   locale,
 }: StepIndicatorProps) {
-  const labels = locale === "ar" ? STEP_LABELS_AR : STEP_LABELS_FR;
+  const currentLocale = getZakatLocale(locale);
+  const labels = STEP_LABELS[currentLocale];
 
   return (
     <div className="w-full mb-8">
-      {/* Progress bar */}
       <div className="relative h-2 bg-green-pale rounded-full mb-4 overflow-hidden">
         <div
           className="absolute top-0 start-0 h-full bg-gold rounded-full transition-all duration-500"
@@ -45,7 +31,6 @@ export default function StepIndicator({
         />
       </div>
 
-      {/* Step dots */}
       <div className="flex justify-between items-start">
         {Array.from({ length: totalSteps }).map((_, i) => {
           const isActive = i === currentStep;
@@ -61,7 +46,7 @@ export default function StepIndicator({
                     : "bg-white/80 text-green-deep/40 border border-green-deep/20"
                 }`}
               >
-                {isCompleted ? "✓" : locale === "ar" ? (i + 1).toLocaleString("ar-MA") : i + 1}
+                {isCompleted ? "✓" : currentLocale === "ar" ? (i + 1).toLocaleString("ar-MA") : i + 1}
               </div>
               <span
                 className={`text-[10px] font-cairo text-center leading-tight hidden sm:block ${

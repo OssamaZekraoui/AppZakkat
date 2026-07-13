@@ -3,6 +3,7 @@
 import type { Currency, ZakatAssets, MetalPrices, ZakatSchool } from "@/lib/zakat/types";
 import { SCHOOL_RULES } from "@/lib/zakat/schools";
 import AssetInput from "../ui/AssetInput";
+import { numberLocale, pickText } from "../zakatText";
 
 interface Step2Props {
   assets: ZakatAssets;
@@ -23,7 +24,6 @@ export default function Step2Metals({
   school,
   locale,
 }: Step2Props) {
-  const isAr = locale === "ar";
   const rules = SCHOOL_RULES[school];
   const rate = exchangeRates[currency] || 1;
   const goldPrice = (metalPrices?.goldPerGram ?? 0) * rate;
@@ -34,28 +34,30 @@ export default function Step2Metals({
   const jewelryValue = assets.goldJewelryGrams * goldPrice;
 
   const fmt = (n: number) =>
-    n.toLocaleString(isAr ? "ar-MA" : "fr-FR", {
+    n.toLocaleString(numberLocale(locale), {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
+
+  const gram = pickText(locale, { ar: "غ", fr: "g", en: "g" });
 
   return (
     <div className="space-y-6">
       <div className="text-center mb-2">
         <h2 className="font-amiri text-2xl font-bold text-green-deep">
-          {isAr ? "الذهب والفضة" : "Or et Argent"}
+          {pickText(locale, { ar: "الذهب والفضة", fr: "Or et argent", en: "Gold and silver" })}
         </h2>
       </div>
 
       <div className="space-y-4">
-        {/* Gold */}
         <AssetInput
           label="Gold (grams)"
+          labelFr="Or (grammes)"
           labelAr="ذهب (غرام)"
           icon="🥇"
           value={assets.goldGrams}
           onChange={(v) => onUpdate("goldGrams", v)}
-          suffix={isAr ? "غ" : "g"}
+          suffix={gram}
           locale={locale}
         />
         {assets.goldGrams > 0 && (
@@ -64,23 +66,27 @@ export default function Step2Metals({
           </div>
         )}
 
-        {/* Gold jewelry */}
         <AssetInput
           label="Gold jewelry (grams)"
+          labelFr="Bijoux en or (grammes)"
           labelAr="حلي ذهبية (غرام)"
           icon="💍"
           value={assets.goldJewelryGrams}
           onChange={(v) => onUpdate("goldJewelryGrams", v)}
-          suffix={isAr ? "غ" : "g"}
+          suffix={gram}
           locale={locale}
           hint={
             rules.goldJewelryZakatable
-              ? isAr
-                ? "تُزكى الحلي في هذا المذهب"
-                : "Les bijoux sont zakatables dans cette école"
-              : isAr
-              ? "لا تُزكى الحلي في هذا المذهب"
-              : "Les bijoux ne sont PAS zakatables dans cette école"
+              ? pickText(locale, {
+                  ar: "تُزكى الحلي في هذا المذهب",
+                  fr: "Les bijoux sont zakatables dans cette école",
+                  en: "Jewelry is zakatable in this school",
+                })
+              : pickText(locale, {
+                  ar: "لا تُزكى الحلي في هذا المذهب",
+                  fr: "Les bijoux ne sont pas zakatables dans cette école",
+                  en: "Jewelry is not zakatable in this school",
+                })
           }
         />
         {assets.goldJewelryGrams > 0 && (
@@ -95,20 +101,20 @@ export default function Step2Metals({
             = {fmt(jewelryValue)} {currency}
             {!rules.goldJewelryZakatable && (
               <span className="text-xs no-underline ms-2">
-                ({isAr ? "غير محتسبة" : "non comptée"})
+                ({pickText(locale, { ar: "غير محتسبة", fr: "non comptée", en: "not counted" })})
               </span>
             )}
           </div>
         )}
 
-        {/* Silver */}
         <AssetInput
           label="Silver (grams)"
+          labelFr="Argent (grammes)"
           labelAr="فضة (غرام)"
           icon="🥈"
           value={assets.silverGrams}
           onChange={(v) => onUpdate("silverGrams", v)}
-          suffix={isAr ? "غ" : "g"}
+          suffix={gram}
           locale={locale}
         />
         {assets.silverGrams > 0 && (

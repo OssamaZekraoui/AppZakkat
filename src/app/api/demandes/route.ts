@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getAuthUser } from "@/lib/auth";
 import { fullRequestSchema } from "@/lib/validations/demande";
 
 function generateReferenceCode(): string {
@@ -8,16 +9,17 @@ function generateReferenceCode(): string {
   return `DY-${year}-${rand}`;
 }
 
-// POST /api/demandes — Create a new request
+// POST /api/demandes - Create a new request
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const authUser = getAuthUser(request);
 
-    // TODO: get real userId from auth session
-    const userId = body.userId;
-    if (!userId) {
-      return NextResponse.json({ error: "userId is required" }, { status: 400 });
+    if (!authUser) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
+
+    const body = await request.json();
+    const userId = authUser.userId;
 
     // If draft, minimal validation
     if (body.status === "DRAFT") {
@@ -86,7 +88,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET /api/demandes — List requests
+// GET /api/demandes - List requests
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -154,7 +156,11 @@ export async function GET(request: NextRequest) {
         isAnonymous: r.isAnonymous,
         iban: r.iban,
         deadline: r.deadline?.toISOString() || null,
-        documents: Array.isArray(docs.files) ? docs.files : (Array.isArray(r.documents) ? r.documents : []),
+        documents: Array.isArray(docs.files)
+          ? docs.files
+          : Array.isArray(r.documents)
+            ? r.documents
+            : [],
         donorCount: 0,
         displayName: r.isAnonymous ? "" : (r.user?.name || ""),
         createdAt: r.createdAt.toISOString(),

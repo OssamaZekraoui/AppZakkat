@@ -1,8 +1,11 @@
 "use client";
 
+import { pickText } from "../zakatText";
+
 interface AssetInputProps {
   label: string;
   labelAr?: string;
+  labelFr?: string;
   value: number;
   onChange: (value: number) => void;
   icon?: string;
@@ -15,6 +18,7 @@ interface AssetInputProps {
 export default function AssetInput({
   label,
   labelAr,
+  labelFr,
   value,
   onChange,
   icon,
@@ -23,14 +27,18 @@ export default function AssetInput({
   locale,
   disabled = false,
 }: AssetInputProps) {
-  const isAr = locale === "ar";
+  const displayLabel = pickText(locale, {
+    ar: labelAr || label,
+    fr: labelFr || label,
+    en: label,
+  });
 
   return (
     <div className="group">
       <label className="block mb-1.5">
         <span className="font-cairo text-sm font-semibold text-green-deep flex items-center gap-2">
           {icon && <span className="text-base">{icon}</span>}
-          {isAr && labelAr ? labelAr : label}
+          {displayLabel}
         </span>
       </label>
       <div className="relative">
@@ -42,14 +50,15 @@ export default function AssetInput({
           onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
           placeholder="0.00"
           disabled={disabled}
-          className="w-full px-4 py-3 rounded-xl border-2 border-green-deep/10 bg-white font-lato text-lg
+          className={`w-full py-3 rounded-xl border-2 border-green-deep/10 bg-white font-lato text-lg text-left
                      focus:border-gold focus:ring-2 focus:ring-gold/20 outline-none transition-all
                      disabled:opacity-50 disabled:cursor-not-allowed
-                     [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                     [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none
+                     ${suffix ? "pl-4 pr-20" : "px-4"}`}
           dir="ltr"
         />
         {suffix && (
-          <span className="absolute end-3 top-1/2 -translate-y-1/2 text-sm text-green-deep/50 font-cairo">
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-green-deep/50 font-cairo pointer-events-none">
             {suffix}
           </span>
         )}
