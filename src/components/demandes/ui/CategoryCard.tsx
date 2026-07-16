@@ -1,6 +1,7 @@
 "use client";
 
 import type { CategoryInfo } from "@/types/demandes";
+import AppIcon from "@/components/ui/AppIcon";
 
 interface CategoryCardProps {
   category: CategoryInfo;
@@ -29,11 +30,13 @@ export default function CategoryCard({
       {/* Check mark */}
       {selected && (
         <div className="absolute top-3 end-3 w-6 h-6 rounded-full bg-gold flex items-center justify-center">
-          <span className="text-green-deep text-sm font-bold">✓</span>
+          <AppIcon name="check" className="h-4 w-4 text-green-deep" strokeWidth={2.5} />
         </div>
       )}
 
-      <div className="text-3xl mb-3">{category.icon}</div>
+      <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-lg bg-green-pale/60 text-green-deep">
+        <AppIcon name={category.icon} className="h-6 w-6" />
+      </div>
       <h3 className="font-cairo font-bold text-green-deep text-sm mb-1">
         {isAr ? category.labelAr : category.labelFr}
       </h3>

@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import AppIcon, { type AppIconName } from "@/components/ui/AppIcon";
 
 // Demo data — will be replaced by API calls
 const demoCauses = [
@@ -9,7 +10,7 @@ const demoCauses = [
     id: "1",
     titleAr: "علاج طفل مصاب بمرض نادر",
     category: "PERSONAL",
-    categoryIcon: "🤝",
+    categoryIcon: "handshake" as AppIconName,
     country: "المغرب 🇲🇦",
     targetAmount: 25000,
     currentAmount: 18500,
@@ -21,7 +22,7 @@ const demoCauses = [
     id: "2",
     titleAr: "بناء مسجد في قرية نائية",
     category: "RELIGIOUS",
-    categoryIcon: "🕌",
+    categoryIcon: "landmark" as AppIconName,
     country: "الجزائر 🇩🇿",
     targetAmount: 50000,
     currentAmount: 32000,
@@ -33,7 +34,7 @@ const demoCauses = [
     id: "3",
     titleAr: "زكاة المال لعائلات محتاجة",
     category: "ZAKAT",
-    categoryIcon: "🌙",
+    categoryIcon: "moon" as AppIconName,
     country: "تونس 🇹🇳",
     targetAmount: 15000,
     currentAmount: 4200,
@@ -93,11 +94,13 @@ function CauseCard({
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-green-pale/30 overflow-hidden">
+    <div className="overflow-hidden rounded-lg border border-green-pale/30 bg-white shadow-sm transition-shadow duration-200 hover:shadow-md">
       {/* Header */}
       <div className="p-5 pb-3">
         <div className="flex items-start justify-between mb-3">
-          <span className="text-2xl">{cause.categoryIcon}</span>
+          <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-green-pale/70 text-green-deep">
+            <AppIcon name={cause.categoryIcon} className="h-6 w-6" />
+          </span>
           {cause.isUrgent && (
             <span className="bg-red-100 text-red-700 text-xs font-cairo font-bold px-3 py-1 rounded-full">
               {t("urgent")}
@@ -109,8 +112,9 @@ function CauseCard({
           {cause.titleAr}
         </h3>
 
-        <p className="text-gray-500 font-cairo text-sm">
-          📍 {cause.country}
+        <p className="flex items-center gap-1.5 text-sm text-gray-500 font-cairo">
+          <AppIcon name="location" className="h-4 w-4 shrink-0" />
+          {cause.country}
         </p>
       </div>
 
@@ -135,21 +139,19 @@ function CauseCard({
 
       {/* RIB Block */}
       <div className="mx-4 mb-4 bg-cream border-2 border-dashed border-gold/40 rounded-xl p-4">
-        <p className="text-green-deep font-cairo text-sm font-bold mb-2">
-          🏦 {t("donateViaTransfer")}
+        <p className="mb-2 flex items-center gap-2 text-sm font-bold text-green-deep font-cairo">
+          <AppIcon name="building" className="h-4 w-4" />
+          {t("donateViaTransfer")}
         </p>
         <p className="font-mono text-sm text-gray-700 bg-white rounded-lg px-3 py-2 mb-2 break-all select-all">
           {cause.iban}
         </p>
         <button
           onClick={handleCopy}
-          className="w-full py-2 bg-gold/10 hover:bg-gold/20 text-gold-light font-cairo text-sm font-bold rounded-lg transition-colors min-h-[44px] flex items-center justify-center gap-2"
+          className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-gold/10 py-2 text-sm font-bold text-gold-light transition-colors hover:bg-gold/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold font-cairo"
         >
-          {copied ? (
-            <>✅ {t("copied")}</>
-          ) : (
-            <>📋 {t("copyRib")}</>
-          )}
+          <AppIcon name={copied ? "check" : "copy"} className="h-4 w-4" />
+          {copied ? t("copied") : t("copyRib")}
         </button>
         <p className="text-gray-500 text-xs font-cairo mt-2">
           {t("reference")}: <span className="font-mono font-bold text-green-medium">{cause.referenceCode}</span>

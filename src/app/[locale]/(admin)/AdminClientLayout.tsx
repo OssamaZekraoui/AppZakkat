@@ -3,21 +3,18 @@
 import { useLocale } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { adminText, getAdminLocale } from "@/lib/adminText";
+import AppIcon, { type AppIconName } from "@/components/ui/AppIcon";
 
 function Icon({ name }: { name: "home" | "requests" | "donations" | "users" | "back" }) {
-  const paths = {
-    home: "M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10",
-    requests: "M7 4h7l4 4v12H7V4zm7 0v5h5M9 13h6M9 17h6",
-    donations: "M12 21s-7-4.35-7-10a4 4 0 017-2.65A4 4 0 0119 11c0 5.65-7 10-7 10z",
-    users: "M16 11a4 4 0 10-8 0M4 21a8 8 0 0116 0M20 8a3 3 0 00-3-3M4 8a3 3 0 013-3",
-    back: "M19 12H5m0 0l6-6m-6 6l6 6",
+  const icons: Record<typeof name, AppIconName> = {
+    home: "dashboard",
+    requests: "file",
+    donations: "hand-heart",
+    users: "users",
+    back: "arrow-left",
   };
 
-  return (
-    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={paths[name]} />
-    </svg>
-  );
+  return <AppIcon name={icons[name]} className="h-5 w-5" />;
 }
 
 export function AdminClientLayout({ children }: { children: React.ReactNode }) {
@@ -60,7 +57,7 @@ export function AdminClientLayout({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 rounded-2xl px-4 py-3 font-cairo text-sm font-bold transition ${
+                className={`flex min-h-11 items-center gap-3 rounded-lg px-4 py-3 font-cairo text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${
                   isActive
                     ? "bg-gold text-green-deep shadow-lg shadow-gold/15"
                     : "text-white/72 hover:bg-white/8 hover:text-white"
@@ -76,7 +73,7 @@ export function AdminClientLayout({ children }: { children: React.ReactNode }) {
         <div className="relative border-t border-gold/20 p-4">
           <Link
             href="/"
-            className="flex items-center gap-2 rounded-2xl px-4 py-3 font-cairo text-sm font-bold text-white/62 transition hover:bg-white/8 hover:text-white"
+            className="flex min-h-11 items-center gap-2 rounded-lg px-4 py-3 font-cairo text-sm font-bold text-white/62 transition-colors hover:bg-white/8 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
           >
             <Icon name="back" />
             <span>{t.backToSite}</span>

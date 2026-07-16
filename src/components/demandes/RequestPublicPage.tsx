@@ -5,6 +5,7 @@ import type { RequestWithStatus } from "@/types/demandes";
 import { CATEGORIES, COUNTRIES } from "@/types/demandes";
 import RequestStatusBadge from "./ui/RequestStatusBadge";
 import RequestUpdates from "./RequestUpdates";
+import AppIcon from "@/components/ui/AppIcon";
 
 interface RequestPublicPageProps {
   request: RequestWithStatus;
@@ -48,7 +49,11 @@ export default function RequestPublicPage({
       {/* Header */}
       <div>
         <div className="flex items-center gap-2 mb-3 flex-wrap">
-          <span className="text-xl">{cat?.icon}</span>
+          {cat && (
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-pale/60 text-green-deep">
+              <AppIcon name={cat.icon} className="h-4 w-4" />
+            </span>
+          )}
           <span className="font-cairo text-xs bg-green-pale/50 text-green-deep px-2.5 py-1 rounded-full font-bold">
             {isAr ? cat?.labelAr : cat?.labelFr}
           </span>
@@ -73,11 +78,13 @@ export default function RequestPublicPage({
         )}
 
         <div className="flex items-center gap-4 text-sm font-cairo text-green-deep/50">
-          <span>
-            📍 {request.city}, {country?.flag} {isAr ? country?.labelAr : country?.labelFr}
+          <span className="flex items-center gap-1.5">
+            <AppIcon name="location" className="h-4 w-4" />
+            {request.city}, {country?.flag} {isAr ? country?.labelAr : country?.labelFr}
           </span>
-          <span>
-            📅 {new Date(request.createdAt).toLocaleDateString(isAr ? "ar-MA" : "fr-FR")}
+          <span className="flex items-center gap-1.5">
+            <AppIcon name="calendar" className="h-4 w-4" />
+            {new Date(request.createdAt).toLocaleDateString(isAr ? "ar-MA" : "fr-FR")}
           </span>
         </div>
       </div>
@@ -108,8 +115,9 @@ export default function RequestPublicPage({
 
       {/* IBAN Block — the most important */}
       <div className="bg-gradient-to-br from-cream to-gold/10 rounded-2xl border-2 border-gold/30 p-6">
-        <h3 className="font-cairo font-bold text-green-deep mb-1">
-          🏦 {isAr ? "تبرع عبر تحويل بنكي مباشر" : "Don par virement bancaire direct"}
+        <h3 className="flex items-center gap-2 font-cairo font-bold text-green-deep mb-1">
+          <AppIcon name="building" className="h-5 w-5 text-gold" />
+          {isAr ? "تبرع عبر تحويل بنكي مباشر" : "Don par virement bancaire direct"}
         </h3>
         <p className="font-cairo text-xs text-green-deep/50 mb-4">
           {isAr
@@ -122,9 +130,10 @@ export default function RequestPublicPage({
             <span className="font-cairo text-xs text-green-deep/50">IBAN</span>
             <button
               onClick={copyIBAN}
-              className="text-xs font-cairo font-bold text-gold hover:text-green-deep transition-colors"
+              className="flex min-h-11 items-center gap-1.5 rounded-lg px-2 text-xs font-cairo font-bold text-gold transition-colors duration-200 hover:bg-gold/10 hover:text-green-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
             >
-              {copied ? (isAr ? "تم النسخ ✓" : "Copié ✓") : (isAr ? "نسخ RIB" : "Copier RIB")}
+              <AppIcon name={copied ? "check" : "copy"} className="h-4 w-4" />
+              {copied ? (isAr ? "تم النسخ" : "Copié") : (isAr ? "نسخ RIB" : "Copier RIB")}
             </button>
           </div>
           <code className="block font-lato text-lg font-bold text-green-deep tracking-widest" dir="ltr">
@@ -178,7 +187,7 @@ export default function RequestPublicPage({
             <h3 className="font-cairo font-bold text-green-deep">
               {isAr ? "تفصيل المصاريف" : "Ventilation des dépenses"}
             </h3>
-            <span className="text-green-deep/30">{showBreakdown ? "▲" : "▼"}</span>
+            <AppIcon name={showBreakdown ? "chevron-up" : "chevron-down"} className="h-5 w-5 text-green-deep/40" />
           </button>
           {showBreakdown && (
             <div className="px-5 pb-5 divide-y divide-green-deep/5">
@@ -208,9 +217,10 @@ export default function RequestPublicPage({
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => navigator.clipboard.writeText(shareUrl)}
-            className="px-4 py-2 rounded-lg bg-green-deep/5 text-sm font-cairo text-green-deep hover:bg-green-deep/10 transition-colors"
+            className="flex min-h-11 items-center gap-2 rounded-lg bg-green-deep/5 px-4 py-2 text-sm text-green-deep transition-colors hover:bg-green-deep/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold font-cairo"
           >
-            🔗 {isAr ? "نسخ الرابط" : "Copier le lien"}
+            <AppIcon name="link" className="h-4 w-4" />
+            {isAr ? "نسخ الرابط" : "Copier le lien"}
           </button>
           <a
             href={`https://wa.me/?text=${encodeURIComponent(shareText + " " + shareUrl)}`}

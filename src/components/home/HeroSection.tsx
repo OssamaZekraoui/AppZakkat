@@ -2,6 +2,7 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import { CrescentMoon } from "@/components/icons/IslamicPattern";
+import AppIcon from "@/components/ui/AppIcon";
 
 export default function HeroSection() {
   const t = useTranslations("hero");
@@ -60,15 +61,17 @@ export default function HeroSection() {
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
           <a
             href="#requests"
-            className="w-full sm:w-auto px-8 py-4 bg-gold hover:bg-gold-light text-green-deep font-cairo font-bold rounded-xl transition-all transform hover:scale-105 text-center min-h-[44px]"
+            className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-gold px-8 py-4 text-center font-cairo font-bold text-green-deep transition-colors duration-200 hover:bg-gold-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-green-deep sm:w-auto"
           >
-            🙌 {t("ctaExplore")}
+            <AppIcon name="hand-heart" className="h-5 w-5" />
+            {t("ctaExplore")}
           </a>
           <a
             href="#zakat"
-            className="w-full sm:w-auto px-8 py-4 bg-white/10 hover:bg-white/20 text-white border border-white/20 font-cairo font-bold rounded-xl transition-all text-center min-h-[44px]"
+            className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-white/20 bg-white/10 px-8 py-4 text-center font-cairo font-bold text-white transition-colors duration-200 hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold sm:w-auto"
           >
-            🌙 {t("ctaZakat")}
+            <AppIcon name="moon" className="h-5 w-5" />
+            {t("ctaZakat")}
           </a>
         </div>
 

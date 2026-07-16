@@ -1,19 +1,20 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import AppIcon, { type AppIconName } from "@/components/ui/AppIcon";
 
-const categories = [
-  { icon: "🌙", key: "zakat" },
-  { icon: "🤝", key: "personal" },
-  { icon: "🏥", key: "medical" },
-  { icon: "🕌", key: "religious" },
-  { icon: "🫶", key: "association" },
-  { icon: "🌍", key: "humanitarian" },
-  { icon: "📚", key: "education" },
-  { icon: "🕊️", key: "funeral" },
-  { icon: "🌙", key: "eid" },
-  { icon: "👶", key: "orphans" },
-] as const;
+const categories: { icon: AppIconName; key: string }[] = [
+  { icon: "moon", key: "zakat" },
+  { icon: "hand-heart", key: "personal" },
+  { icon: "medical", key: "medical" },
+  { icon: "landmark", key: "religious" },
+  { icon: "users", key: "association" },
+  { icon: "earth", key: "humanitarian" },
+  { icon: "education", key: "education" },
+  { icon: "feather", key: "funeral" },
+  { icon: "sparkles", key: "eid" },
+  { icon: "baby", key: "orphans" },
+];
 
 export default function Categories() {
   const t = useTranslations("categories");
@@ -31,8 +32,8 @@ export default function Categories() {
               key={cat.key}
               className="group bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all border border-transparent hover:border-gold/40 text-center cursor-pointer"
             >
-              <div className="text-4xl mb-3 group-hover:scale-110 transition-transform">
-                {cat.icon}
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-green-pale/60 text-green-deep transition-colors duration-200 group-hover:bg-gold/20 group-hover:text-gold">
+                <AppIcon name={cat.icon} className="h-6 w-6" />
               </div>
               <h3 className="text-green-deep font-cairo font-bold text-sm sm:text-base">
                 {t(cat.key)}

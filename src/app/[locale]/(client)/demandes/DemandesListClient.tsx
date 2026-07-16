@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import type { RequestWithStatus, RequestCategory } from "@/types/demandes";
 import { CATEGORIES } from "@/types/demandes";
 import RequestCard from "@/components/demandes/ui/RequestCard";
+import AppIcon from "@/components/ui/AppIcon";
 
 interface DemandesListClientProps {
   locale: string;
@@ -68,7 +69,7 @@ export default function DemandesListClient({ locale }: DemandesListClientProps) 
                 : "bg-white text-green-deep/60 border border-green-deep/10 hover:border-gold/40"
             }`}
           >
-            <span>{cat.icon}</span>
+            <AppIcon name={cat.icon} className="h-4 w-4" />
             <span>{isAr ? cat.labelAr : cat.labelFr}</span>
           </button>
         ))}
@@ -95,7 +96,9 @@ export default function DemandesListClient({ locale }: DemandesListClientProps) 
       {/* Results */}
       {!loading && requests.length === 0 && (
         <div className="text-center py-16">
-          <div className="text-5xl mb-4">📭</div>
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-lg bg-green-pale/50 text-green-medium">
+            <AppIcon name="inbox" className="h-7 w-7" />
+          </div>
           <p className="font-cairo text-green-deep/50 text-lg">
             {t("noRequests")}
           </p>

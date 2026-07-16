@@ -69,7 +69,7 @@ export default function Step6Debts({
           label="Short-term debts"
           labelFr="Dettes à court terme"
           labelAr="ديون قصيرة الأجل (أقل من سنة)"
-          icon="📉"
+          icon="trend-down"
           value={assets.shortTermDebts}
           onChange={(v) => onUpdate("shortTermDebts", v)}
           suffix={currency}
@@ -79,7 +79,7 @@ export default function Step6Debts({
           label="Essential expenses"
           labelFr="Dépenses essentielles"
           labelAr="مصاريف أساسية فورية"
-          icon="🏠"
+          icon="house"
           value={assets.essentialExpenses}
           onChange={(v) => onUpdate("essentialExpenses", v)}
           suffix={currency}

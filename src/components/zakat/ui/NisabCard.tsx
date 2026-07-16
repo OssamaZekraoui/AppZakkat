@@ -2,6 +2,7 @@
 
 import type { MetalPrices, Currency } from "@/lib/zakat/types";
 import { numberLocale, pickText } from "../zakatText";
+import AppIcon from "@/components/ui/AppIcon";
 
 interface NisabCardProps {
   metalPrices: MetalPrices | null;
@@ -65,7 +66,7 @@ export default function NisabCard({
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-white rounded-xl p-3 border border-gold/20">
           <div className="flex items-center gap-1.5 mb-1">
-            <span className="text-lg">🥇</span>
+            <AppIcon name="coins" className="h-4 w-4 text-gold" />
             <span className="text-xs font-cairo text-green-deep/60">
               {pickText(locale, { ar: "ذهب", fr: "Or", en: "Gold" })} (85g)
             </span>
@@ -80,7 +81,7 @@ export default function NisabCard({
 
         <div className="bg-white rounded-xl p-3 border border-green-deep/10">
           <div className="flex items-center gap-1.5 mb-1">
-            <span className="text-lg">🥈</span>
+            <AppIcon name="scale" className="h-4 w-4 text-green-deep/60" />
             <span className="text-xs font-cairo text-green-deep/60">
               {pickText(locale, { ar: "فضة", fr: "Argent", en: "Silver" })} (595g)
             </span>

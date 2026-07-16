@@ -1,6 +1,7 @@
 "use client";
 
 import type { RequestFormData, AmountBreakdown, Currency, RequestCategory } from "@/types/demandes";
+import AppIcon from "@/components/ui/AppIcon";
 
 interface Step3Props {
   data: Partial<RequestFormData>;
@@ -178,11 +179,10 @@ export default function Step3Amount({
                 />
                 <button
                   onClick={() => removeLine(i)}
-                  className="p-2 rounded-lg text-red-400 hover:bg-red-50 transition-colors"
+                  className="flex h-11 w-11 items-center justify-center rounded-lg text-red-400 transition-colors hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300"
+                  aria-label={isAr ? "حذف" : "Supprimer"}
                 >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M18 6L6 18M6 6l12 12" />
-                  </svg>
+                  <AppIcon name="close" className="h-4 w-4" />
                 </button>
               </div>
             ))}

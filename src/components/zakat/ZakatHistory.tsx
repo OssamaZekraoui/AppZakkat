@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import AppIcon from "@/components/ui/AppIcon";
 
 interface HistoryEntry {
   id: string;
@@ -56,7 +57,9 @@ export default function ZakatHistory({ locale }: ZakatHistoryProps) {
   if (entries.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="text-4xl mb-4">📋</div>
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-lg bg-green-pale/60 text-green-deep">
+          <AppIcon name="clipboard" className="h-7 w-7" />
+        </div>
         <p className="font-cairo text-green-deep/50">
           {isAr ? "لا توجد حسابات سابقة" : "Aucun calcul précédent"}
         </p>

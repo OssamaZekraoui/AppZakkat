@@ -2,13 +2,14 @@
 
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
+import AppIcon, { type AppIconName } from "@/components/ui/AppIcon";
 
 const steps = [
-  { num: 1, icon: "📝", titleKey: "step1Title", descKey: "step1Desc" },
-  { num: 2, icon: "🔍", titleKey: "step2Title", descKey: "step2Desc" },
-  { num: 3, icon: "🏦", titleKey: "step3Title", descKey: "step3Desc" },
-  { num: 4, icon: "✅", titleKey: "step4Title", descKey: "step4Desc" },
-] as const;
+  { num: 1, icon: "file-edit", titleKey: "step1Title", descKey: "step1Desc" },
+  { num: 2, icon: "search", titleKey: "step2Title", descKey: "step2Desc" },
+  { num: 3, icon: "building", titleKey: "step3Title", descKey: "step3Desc" },
+  { num: 4, icon: "badge-check", titleKey: "step4Title", descKey: "step4Desc" },
+] satisfies ReadonlyArray<{ num: number; icon: AppIconName; titleKey: string; descKey: string }>;
 
 export default function HowItWorks() {
   const t = useTranslations("howItWorks");
@@ -25,7 +26,7 @@ export default function HowItWorks() {
           {steps.map((step) => (
             <div
               key={step.num}
-              className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow border border-green-pale/50 text-center"
+              className="rounded-lg border border-green-pale/50 bg-white p-6 text-center shadow-sm transition-shadow duration-200 hover:shadow-md"
             >
               {/* Step number */}
               <div className="w-12 h-12 rounded-full bg-gold/20 flex items-center justify-center mx-auto mb-4">
@@ -35,7 +36,9 @@ export default function HowItWorks() {
               </div>
 
               {/* Icon */}
-              <div className="text-3xl mb-3">{step.icon}</div>
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-green-pale/70 text-green-deep">
+                <AppIcon name={step.icon} className="h-6 w-6" />
+              </div>
 
               {/* Title */}
               <h3 className="text-green-deep font-cairo font-bold text-lg mb-2">

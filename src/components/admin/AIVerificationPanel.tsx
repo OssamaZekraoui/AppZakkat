@@ -7,6 +7,7 @@ import type {
   VerificationFlag,
   DataMismatch,
 } from "@/types/verification";
+import AppIcon, { type AppIconName } from "@/components/ui/AppIcon";
 
 interface AIVerificationPanelProps {
   verification: RequestVerificationSummary;
@@ -25,21 +26,21 @@ const RECOMMENDATION_CONFIG = {
     labelFr: "Approbation recommandée",
     labelEn: "Approval recommended",
     color: "bg-emerald-100 text-emerald-700 border-emerald-200",
-    icon: "\u2713",
+    icon: "success" as AppIconName,
   },
   REVIEW: {
     labelAr: "يحتاج مراجعة إضافية",
     labelFr: "Examen supplémentaire requis",
     labelEn: "Additional review needed",
     color: "bg-amber-100 text-amber-700 border-amber-200",
-    icon: "!",
+    icon: "alert" as AppIconName,
   },
   REJECT: {
     labelAr: "يُوصى بالرفض",
     labelFr: "Rejet recommandé",
     labelEn: "Rejection recommended",
     color: "bg-red-100 text-red-700 border-red-200",
-    icon: "\u2717",
+    icon: "error" as AppIconName,
   },
 };
 
@@ -157,14 +158,7 @@ function DocumentResultCard({
           >
             {result.confidenceScore}%
           </span>
-          <svg
-            className={`w-4 h-4 text-gray-400 transition-transform ${expanded ? "rotate-180" : ""}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
+          <AppIcon name={expanded ? "chevron-up" : "chevron-down"} className="h-4 w-4 text-gray-400" />
         </div>
       </button>
 
@@ -241,9 +235,7 @@ function DocumentResultCard({
                         <span className="font-cairo text-xs text-red-500 line-through">
                           {m.userProvided}
                         </span>
-                        <svg className="w-3 h-3 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                        </svg>
+                        <AppIcon name="arrow-right" className="h-3 w-3 flex-shrink-0 text-gray-300" />
                         <span className="font-cairo text-xs text-green-deep font-bold">
                           {m.extracted}
                         </span>
@@ -294,9 +286,7 @@ export default function AIVerificationPanel({
       <div className="p-6 border-b border-gray-100">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-8 h-8 rounded-lg bg-green-deep/10 flex items-center justify-center">
-            <svg className="w-4 h-4 text-green-deep" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
+            <AppIcon name="shield" className="h-4 w-4 text-green-deep" />
           </div>
           <div>
             <h3 className="font-amiri text-lg font-bold text-green-deep">
@@ -321,7 +311,7 @@ export default function AIVerificationPanel({
               {verification.overallScore}%
             </p>
             <div className={`inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full border text-xs font-bold font-cairo ${rec.color}`}>
-              <span className="text-sm">{rec.icon}</span>
+              <AppIcon name={rec.icon} className="h-4 w-4" />
               {isAr ? rec.labelAr : rec.labelFr}
             </div>
           </div>

@@ -8,6 +8,7 @@ import { CATEGORIES } from "@/types/demandes";
 import type { RequestVerificationSummary } from "@/types/verification";
 import AIVerificationPanel from "@/components/admin/AIVerificationPanel";
 import { adminText, getAdminLocale, labelFor, statusLabels, urgencyLabels } from "@/lib/adminText";
+import AppIcon from "@/components/ui/AppIcon";
 
 interface AdminRequestDetail {
   id: string;
@@ -161,9 +162,7 @@ export default function AdminRequestReviewPage() {
           href="/admin/demandes"
           className="inline-flex items-center gap-2 rounded-full border border-green-deep/10 bg-white px-4 py-2 font-cairo text-sm font-bold text-green-deep shadow-sm transition hover:border-gold/45 hover:bg-green-pale/35"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
+          <AppIcon name={isAr ? "arrow-right" : "arrow-left"} className="h-4 w-4" />
           {t.backToList}
         </Link>
         <div className="flex items-center gap-2">
@@ -352,15 +351,7 @@ export default function AdminRequestReviewPage() {
                   className="bg-gray-50 rounded-lg p-3 flex items-center gap-3 hover:bg-gray-100 transition-colors group"
                 >
                   <div className="w-9 h-9 rounded-lg bg-white border border-gray-200 flex items-center justify-center flex-shrink-0">
-                    {doc.mimeType?.startsWith("image/") ? (
-                      <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    ) : (
-                      <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                      </svg>
-                    )}
+                    <AppIcon name={doc.mimeType?.startsWith("image/") ? "file-image" : "file"} className={`h-4 w-4 ${doc.mimeType?.startsWith("image/") ? "text-blue-500" : "text-red-500"}`} />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="font-cairo text-xs text-green-deep truncate group-hover:text-gold transition-colors">
@@ -370,9 +361,7 @@ export default function AdminRequestReviewPage() {
                       {doc.category} &middot; {(doc.size / 1024).toFixed(0)} KB
                     </p>
                   </div>
-                  <svg className="w-4 h-4 text-gray-300 group-hover:text-gold transition-colors flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
+                  <AppIcon name="external" className="h-4 w-4 flex-shrink-0 text-gray-300 transition-colors group-hover:text-gold" />
                 </a>
               ))}
             </div>
@@ -403,9 +392,7 @@ export default function AdminRequestReviewPage() {
               disabled={submittingReview}
               className="flex-1 py-3 rounded-xl bg-emerald-600 text-white font-cairo font-bold hover:bg-emerald-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
+              <AppIcon name="check" className="h-5 w-5" />
               {t.approve}
             </button>
             <button
@@ -413,9 +400,7 @@ export default function AdminRequestReviewPage() {
               disabled={submittingReview}
               className="flex-1 py-3 rounded-xl bg-red-500 text-white font-cairo font-bold hover:bg-red-600 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <AppIcon name="close" className="h-5 w-5" />
               {t.reject}
             </button>
           </div>
@@ -434,15 +419,7 @@ export default function AdminRequestReviewPage() {
           <div className={`w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center ${
             reviewResult === "APPROVED" ? "bg-emerald-100" : "bg-red-100"
           }`}>
-            {reviewResult === "APPROVED" ? (
-              <svg className="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            ) : (
-              <svg className="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            )}
+            <AppIcon name={reviewResult === "APPROVED" ? "success" : "error"} className={`h-7 w-7 ${reviewResult === "APPROVED" ? "text-emerald-600" : "text-red-600"}`} />
           </div>
           <p
             className={`font-cairo font-bold text-lg ${

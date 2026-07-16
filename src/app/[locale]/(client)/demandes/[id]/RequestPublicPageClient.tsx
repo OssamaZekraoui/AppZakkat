@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import type { RequestWithStatus } from "@/types/demandes";
 import RequestPublicPage from "@/components/demandes/RequestPublicPage";
+import AppIcon from "@/components/ui/AppIcon";
 
 interface Props {
   locale: string;
@@ -50,7 +51,9 @@ export default function RequestPublicPageClient({ locale }: Props) {
   if (error || !request) {
     return (
       <div className="max-w-lg mx-auto text-center py-20">
-        <div className="text-5xl mb-4">📋</div>
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-lg bg-green-pale/60 text-green-deep">
+          <AppIcon name="clipboard" className="h-7 w-7" />
+        </div>
         <h2 className="font-amiri text-2xl font-bold text-green-deep mb-2">
           {isAr ? "الطلب غير موجود" : "Demande introuvable"}
         </h2>

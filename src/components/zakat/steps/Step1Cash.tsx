@@ -49,7 +49,7 @@ export default function Step1Cash({
           label="Cash"
           labelFr="Espèces"
           labelAr="نقد"
-          icon="💵"
+          icon="banknote"
           value={assets.cash}
           onChange={(v) => onUpdate("cash", v)}
           suffix={currency}
@@ -59,7 +59,7 @@ export default function Step1Cash({
           label="Bank accounts"
           labelFr="Comptes bancaires"
           labelAr="حسابات بنكية"
-          icon="🏦"
+          icon="building"
           value={assets.bankAccounts}
           onChange={(v) => onUpdate("bankAccounts", v)}
           suffix={currency}
@@ -69,7 +69,7 @@ export default function Step1Cash({
           label="Savings"
           labelFr="Épargne"
           labelAr="توفير"
-          icon="💰"
+          icon="wallet"
           value={assets.savings}
           onChange={(v) => onUpdate("savings", v)}
           suffix={currency}

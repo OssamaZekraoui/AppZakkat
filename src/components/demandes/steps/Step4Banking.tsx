@@ -1,6 +1,7 @@
 "use client";
 
 import type { RequestFormData } from "@/types/demandes";
+import AppIcon from "@/components/ui/AppIcon";
 import { COUNTRIES } from "@/types/demandes";
 import IBANInput from "../ui/IBANInput";
 
@@ -30,7 +31,9 @@ export default function Step4Banking({
       {/* Important explanation */}
       <div className="bg-cream rounded-2xl p-5 border-2 border-gold/30">
         <div className="flex items-start gap-3">
-          <span className="text-2xl flex-shrink-0">🏦</span>
+          <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg bg-gold/15 text-green-deep">
+            <AppIcon name="building" className="h-6 w-6" />
+          </span>
           <div>
             <h3 className="font-cairo font-bold text-green-deep mb-1">
               {isAr ? "كيف تصلك التبرعات؟" : "Comment recevez-vous les dons ?"}
@@ -133,7 +136,7 @@ export default function Step4Banking({
 
       {/* Security note */}
       <div className="bg-green-pale/20 rounded-xl p-3 flex items-center gap-2">
-        <span className="text-sm">🔒</span>
+        <AppIcon name="lock" className="h-4 w-4 shrink-0 text-green-deep/50" />
         <p className="font-cairo text-xs text-green-deep/50">
           {isAr
             ? "يُحفظ رقم IBAN بشكل آمن. لن نطلب منك كلمة سر أو رمز SMS أبداً."

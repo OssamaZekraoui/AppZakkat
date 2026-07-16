@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { ZakatResult, ZakatSchool } from "@/lib/zakat/types";
 import ZakatResultCard from "../ui/ZakatResultCard";
 import { numberLocale, pickText } from "../zakatText";
+import AppIcon from "@/components/ui/AppIcon";
 
 interface Step7Props {
   result: ZakatResult;
@@ -65,7 +66,7 @@ export default function Step7Results({
           <h3 className="font-cairo font-bold text-green-deep">
             {pickText(locale, { ar: "التفاصيل حسب الفئة", fr: "Détail par catégorie", en: "Breakdown by category" })}
           </h3>
-          <span className="text-green-deep/40">{showBreakdown ? "▲" : "▼"}</span>
+          <AppIcon name={showBreakdown ? "chevron-up" : "chevron-down"} className="h-5 w-5 text-green-deep/50" />
         </button>
         {showBreakdown && (
           <div className="divide-y divide-green-deep/5">
@@ -98,7 +99,7 @@ export default function Step7Results({
           <h3 className="font-cairo font-bold text-green-deep">
             {pickText(locale, { ar: "مقارنة بين المذاهب", fr: "Comparaison entre écoles", en: "School comparison" })}
           </h3>
-          <span className="text-green-deep/40">{showSchoolComp ? "▲" : "▼"}</span>
+          <AppIcon name={showSchoolComp ? "chevron-up" : "chevron-down"} className="h-5 w-5 text-green-deep/50" />
         </button>
         {showSchoolComp && (
           <div className="divide-y divide-green-deep/5">

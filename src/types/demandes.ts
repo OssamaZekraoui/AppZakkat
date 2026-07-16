@@ -140,7 +140,7 @@ export interface CategoryInfo {
   labelAr: string;
   labelFr: string;
   labelEn: string;
-  icon: string;
+  icon: AppIconName;
   descAr: string;
   descFr: string;
 }
@@ -151,7 +151,7 @@ export const CATEGORIES: CategoryInfo[] = [
     labelAr: "مساعدة شخصية",
     labelFr: "Aide personnelle",
     labelEn: "Personal aid",
-    icon: "🤲",
+    icon: "hand-heart",
     descAr: "مساعدة مالية لظروف شخصية",
     descFr: "Aide financière pour circonstances personnelles",
   },
@@ -160,7 +160,7 @@ export const CATEGORIES: CategoryInfo[] = [
     labelAr: "مساعدة طبية",
     labelFr: "Aide médicale",
     labelEn: "Medical aid",
-    icon: "🏥",
+    icon: "medical",
     descAr: "تكاليف علاج أو عملية جراحية",
     descFr: "Frais de traitement ou opération chirurgicale",
   },
@@ -169,7 +169,7 @@ export const CATEGORIES: CategoryInfo[] = [
     labelAr: "مشروع ديني",
     labelFr: "Projet religieux",
     labelEn: "Religious project",
-    icon: "🕌",
+    icon: "landmark",
     descAr: "بناء أو ترميم مسجد أو مدرسة قرآنية",
     descFr: "Construction ou rénovation de mosquée ou école coranique",
   },
@@ -178,7 +178,7 @@ export const CATEGORIES: CategoryInfo[] = [
     labelAr: "جمعية خيرية",
     labelFr: "Association caritative",
     labelEn: "Charity association",
-    icon: "🏛️",
+    icon: "users",
     descAr: "مشروع جمعوي خيري",
     descFr: "Projet associatif caritatif",
   },
@@ -187,7 +187,7 @@ export const CATEGORIES: CategoryInfo[] = [
     labelAr: "إغاثة إنسانية",
     labelFr: "Aide humanitaire",
     labelEn: "Humanitarian relief",
-    icon: "🌍",
+    icon: "earth",
     descAr: "إغاثة في مناطق الكوارث والأزمات",
     descFr: "Secours dans les zones de catastrophes et crises",
   },
@@ -196,7 +196,7 @@ export const CATEGORIES: CategoryInfo[] = [
     labelAr: "تعليم وتكوين",
     labelFr: "Éducation et formation",
     labelEn: "Education & training",
-    icon: "📚",
+    icon: "education",
     descAr: "رسوم دراسية أو تكوين مهني",
     descFr: "Frais scolaires ou formation professionnelle",
   },
@@ -205,7 +205,7 @@ export const CATEGORIES: CategoryInfo[] = [
     labelAr: "مساعدة جنائزية",
     labelFr: "Aide funéraire",
     labelEn: "Funeral aid",
-    icon: "🕊️",
+    icon: "feather",
     descAr: "تكاليف الجنازة والدفن",
     descFr: "Frais funéraires et d'inhumation",
   },
@@ -214,7 +214,7 @@ export const CATEGORIES: CategoryInfo[] = [
     labelAr: "عيد",
     labelFr: "Aide pour l'Aïd",
     labelEn: "Eid aid",
-    icon: "🌙",
+    icon: "moon",
     descAr: "مساعدة لتجهيزات العيد والأضاحي",
     descFr: "Aide pour les préparatifs de l'Aïd et les sacrifices",
   },
@@ -223,7 +223,7 @@ export const CATEGORIES: CategoryInfo[] = [
     labelAr: "يتامى",
     labelFr: "Orphelins",
     labelEn: "Orphans",
-    icon: "👶",
+    icon: "baby",
     descAr: "كفالة ورعاية الأيتام",
     descFr: "Parrainage et prise en charge des orphelins",
   },
@@ -302,3 +302,4 @@ export const COUNTRIES = [
   { code: "SN", labelAr: "السنغال", labelFr: "Sénégal", flag: "🇸🇳" },
   { code: "ML", labelAr: "مالي", labelFr: "Mali", flag: "🇲🇱" },
 ];
+import type { AppIconName } from "@/components/ui/AppIcon";

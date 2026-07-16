@@ -2,6 +2,7 @@
 
 import type { ZakatResult } from "@/lib/zakat/types";
 import { numberLocale, pickText } from "../zakatText";
+import AppIcon from "@/components/ui/AppIcon";
 
 interface ZakatResultCardProps {
   result: ZakatResult;
@@ -44,7 +45,9 @@ export default function ZakatResultCard({
     const gap = result.nisabThreshold - result.netZakatableAssets;
     return (
       <div className="rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-gray-200 p-8 text-center">
-        <div className="text-5xl mb-4">📊</div>
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-lg bg-gray-200 text-gray-600">
+          <AppIcon name="chart" className="h-7 w-7" />
+        </div>
         <h3 className="font-amiri text-2xl text-gray-700 mb-2">
           {pickText(locale, {
             ar: "لم تبلغ أموالك النصاب بعد",

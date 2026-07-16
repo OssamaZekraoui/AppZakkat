@@ -3,6 +3,7 @@
 import type { Currency, ZakatAssets } from "@/lib/zakat/types";
 import AssetInput from "../ui/AssetInput";
 import { numberLocale, pickText } from "../zakatText";
+import AppIcon from "@/components/ui/AppIcon";
 
 interface Step3Props {
   assets: ZakatAssets;
@@ -35,18 +36,19 @@ export default function Step3Investments({
       </div>
 
       <div className="space-y-4">
-        <AssetInput label="Halal stocks" labelFr="Actions halal" labelAr="أسهم حلال" icon="📈" value={assets.halalStocks} onChange={(v) => onUpdate("halalStocks", v)} suffix={currency} locale={locale} />
-        <AssetInput label="Islamic funds" labelFr="Fonds islamiques" labelAr="صناديق إسلامية" icon="📊" value={assets.islamicFunds} onChange={(v) => onUpdate("islamicFunds", v)} suffix={currency} locale={locale} />
-        <AssetInput label="Dividends" labelFr="Dividendes" labelAr="أرباح متراكمة" icon="💹" value={assets.dividends} onChange={(v) => onUpdate("dividends", v)} suffix={currency} locale={locale} />
-        <AssetInput label="Crypto (halal)" labelFr="Crypto halal" labelAr="عملات رقمية حلال" icon="🪙" value={assets.cryptoHalal} onChange={(v) => onUpdate("cryptoHalal", v)} suffix={currency} locale={locale} />
+        <AssetInput label="Halal stocks" labelFr="Actions halal" labelAr="أسهم حلال" icon="chart" value={assets.halalStocks} onChange={(v) => onUpdate("halalStocks", v)} suffix={currency} locale={locale} />
+        <AssetInput label="Islamic funds" labelFr="Fonds islamiques" labelAr="صناديق إسلامية" icon="chart-pie" value={assets.islamicFunds} onChange={(v) => onUpdate("islamicFunds", v)} suffix={currency} locale={locale} />
+        <AssetInput label="Dividends" labelFr="Dividendes" labelAr="أرباح متراكمة" icon="circle-dollar" value={assets.dividends} onChange={(v) => onUpdate("dividends", v)} suffix={currency} locale={locale} />
+        <AssetInput label="Crypto (halal)" labelFr="Crypto halal" labelAr="عملات رقمية حلال" icon="bitcoin" value={assets.cryptoHalal} onChange={(v) => onUpdate("cryptoHalal", v)} suffix={currency} locale={locale} />
 
         {assets.cryptoHalal > 0 && (
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm">
+          <div className="flex gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm">
+            <AppIcon name="alert" className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
             <p className="font-cairo text-amber-700">
               {pickText(locale, {
-                ar: "⚠️ اختلف العلماء في حكم زكاة العملات الرقمية — استشر عالماً",
-                fr: "⚠️ Les savants divergent sur la Zakat des cryptomonnaies — consultez un savant",
-                en: "⚠️ Scholars differ on Zakat for cryptocurrencies — consult a scholar",
+                ar: "اختلف العلماء في حكم زكاة العملات الرقمية — استشر عالماً",
+                fr: "Les savants divergent sur la Zakat des cryptomonnaies — consultez un savant",
+                en: "Scholars differ on Zakat for cryptocurrencies — consult a scholar",
               })}
             </p>
           </div>

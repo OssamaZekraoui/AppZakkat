@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useState } from "react";
+import AppIcon from "@/components/ui/AppIcon";
 
 const GOLD_PRICE_DEFAULT = 850; // MAD per gram (approximate)
 const SILVER_PRICE_DEFAULT = 10; // MAD per gram (approximate)
@@ -49,7 +50,9 @@ export default function ZakatTeaser() {
               {(["bullet1", "bullet2", "bullet3", "bullet4", "bullet5"] as const).map(
                 (key) => (
                   <li key={key} className="flex items-start gap-3">
-                    <span className="text-gold mt-1">✦</span>
+                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gold/15 text-gold">
+                      <AppIcon name="check" className="h-3.5 w-3.5" strokeWidth={2.2} />
+                    </span>
                     <span className="font-cairo text-white/80 text-sm">
                       {t(key)}
                     </span>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 
 export default function Footer() {
   const t = useTranslations("footer");
@@ -12,6 +13,15 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white-off p-1">
+                <Image
+                  src="/diyae-logo.png"
+                  alt=""
+                  width={40}
+                  height={40}
+                  className="h-full w-full object-contain"
+                />
+              </span>
               <span className="font-amiri text-2xl font-bold">{t("brand")}</span>
             </div>
             <p className="text-white/60 font-cairo text-sm leading-relaxed">

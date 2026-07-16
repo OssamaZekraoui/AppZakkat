@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import type { UploadedDocument, DocumentCategory } from "@/types/demandes";
+import AppIcon from "@/components/ui/AppIcon";
 
 interface DocumentUploaderProps {
   label: string;
@@ -153,12 +154,11 @@ export default function DocumentUploader({
           </div>
           <button
             onClick={() => onRemove(uploaded.id)}
-            className="p-1.5 rounded-lg text-red-400 hover:bg-red-50 transition-colors flex-shrink-0"
+            className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg text-red-400 transition-colors hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300"
             title={isAr ? "حذف" : "Supprimer"}
+            aria-label={isAr ? "حذف" : "Supprimer"}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M18 6L6 18M6 6l12 12" />
-            </svg>
+            <AppIcon name="close" className="h-4 w-4" />
           </button>
         </div>
       ) : (
@@ -191,8 +191,8 @@ export default function DocumentUploader({
             </div>
           ) : (
             <>
-              <div className="text-3xl mb-2 text-green-deep/30">
-                {category === "PHOTOS" ? "📸" : "📄"}
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-green-pale/50 text-green-deep/60">
+                <AppIcon name={category === "PHOTOS" ? "camera" : "file"} className="h-6 w-6" />
               </div>
               <p className="font-cairo text-sm text-green-deep/50">
                 {isAr

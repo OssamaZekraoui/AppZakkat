@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { RequestFormData, UrgencyLevel } from "@/types/demandes";
+import AppIcon from "@/components/ui/AppIcon";
 
 interface Step2Props {
   data: Partial<RequestFormData>;
@@ -140,9 +141,10 @@ export default function Step2Details({
             </label>
             <button
               onClick={() => setShowGuide(!showGuide)}
-              className="text-xs font-cairo text-gold hover:text-green-deep transition-colors"
+              className="flex min-h-11 items-center gap-1 rounded-lg px-2 text-xs text-gold transition-colors hover:bg-gold/10 hover:text-green-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold font-cairo"
             >
-              {isAr ? "نصائح الكتابة" : "Guide de rédaction"} {showGuide ? "▲" : "▼"}
+              {isAr ? "نصائح الكتابة" : "Guide de rédaction"}
+              <AppIcon name={showGuide ? "chevron-up" : "chevron-down"} className="h-4 w-4" />
             </button>
           </div>
 

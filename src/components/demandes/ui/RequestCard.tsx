@@ -5,6 +5,7 @@ import { Link } from "@/i18n/navigation";
 import type { RequestWithStatus } from "@/types/demandes";
 import { CATEGORIES } from "@/types/demandes";
 import RequestStatusBadge from "./RequestStatusBadge";
+import AppIcon from "@/components/ui/AppIcon";
 
 interface RequestCardProps {
   request: RequestWithStatus;
@@ -43,7 +44,11 @@ export default function RequestCard({ request, locale }: RequestCardProps) {
         <div className="p-5 pb-3">
           <div className="flex items-start justify-between mb-3">
             <div className="flex items-center gap-2">
-              <span className="text-xl">{cat?.icon}</span>
+              {cat && (
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-pale/50 text-green-deep">
+                  <AppIcon name={cat.icon} className="h-4 w-4" />
+                </span>
+              )}
               <span className="font-cairo text-xs text-green-deep/50">
                 {isAr ? cat?.labelAr : cat?.labelFr}
               </span>
@@ -115,9 +120,10 @@ export default function RequestCard({ request, locale }: RequestCardProps) {
             </code>
             <button
               onClick={copyIBAN}
-              className="text-xs font-cairo text-gold hover:text-green-deep transition-colors flex-shrink-0"
+              className="flex min-h-11 flex-shrink-0 items-center gap-1.5 rounded-lg px-2 text-xs font-cairo font-bold text-gold transition-colors duration-200 hover:bg-gold/10 hover:text-green-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
             >
-              {copied ? (isAr ? "تم ✓" : "Copié ✓") : (isAr ? "نسخ" : "Copier")}
+              <AppIcon name={copied ? "check" : "copy"} className="h-4 w-4" />
+              {copied ? (isAr ? "تم" : "Copié") : (isAr ? "نسخ" : "Copier")}
             </button>
           </div>
         </div>

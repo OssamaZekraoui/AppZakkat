@@ -54,7 +54,7 @@ export default function Step2Metals({
           label="Gold (grams)"
           labelFr="Or (grammes)"
           labelAr="ذهب (غرام)"
-          icon="🥇"
+          icon="coins"
           value={assets.goldGrams}
           onChange={(v) => onUpdate("goldGrams", v)}
           suffix={gram}
@@ -70,7 +70,7 @@ export default function Step2Metals({
           label="Gold jewelry (grams)"
           labelFr="Bijoux en or (grammes)"
           labelAr="حلي ذهبية (غرام)"
-          icon="💍"
+          icon="gem"
           value={assets.goldJewelryGrams}
           onChange={(v) => onUpdate("goldJewelryGrams", v)}
           suffix={gram}
@@ -111,7 +111,7 @@ export default function Step2Metals({
           label="Silver (grams)"
           labelFr="Argent (grammes)"
           labelAr="فضة (غرام)"
-          icon="🥈"
+          icon="scale"
           value={assets.silverGrams}
           onChange={(v) => onUpdate("silverGrams", v)}
           suffix={gram}

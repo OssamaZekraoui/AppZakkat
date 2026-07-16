@@ -35,13 +35,13 @@ export default function Step5Receivables({
       </div>
 
       <div className="space-y-4">
-        <AssetInput label="Loans given (Qard Hasan)" labelFr="Prêts accordés (Qard Hassan)" labelAr="قروض حسنة ممنوحة" icon="🤝" value={assets.loansGiven} onChange={(v) => onUpdate("loansGiven", v)} suffix={currency} locale={locale} />
-        <AssetInput label="Rental income" labelFr="Revenus locatifs accumulés" labelAr="إيرادات إيجارية متراكمة" icon="🏠" value={assets.rentalIncome} onChange={(v) => onUpdate("rentalIncome", v)} suffix={currency} locale={locale} />
+        <AssetInput label="Loans given (Qard Hasan)" labelFr="Prêts accordés (Qard Hassan)" labelAr="قروض حسنة ممنوحة" icon="handshake" value={assets.loansGiven} onChange={(v) => onUpdate("loansGiven", v)} suffix={currency} locale={locale} />
+        <AssetInput label="Rental income" labelFr="Revenus locatifs accumulés" labelAr="إيرادات إيجارية متراكمة" icon="house" value={assets.rentalIncome} onChange={(v) => onUpdate("rentalIncome", v)} suffix={currency} locale={locale} />
         <AssetInput
           label="Agricultural output"
           labelFr="Production agricole"
           labelAr="إنتاج زراعي"
-          icon="🌾"
+          icon="wheat"
           value={assets.agriculturalOutput}
           onChange={(v) => onUpdate("agriculturalOutput", v)}
           suffix={currency}

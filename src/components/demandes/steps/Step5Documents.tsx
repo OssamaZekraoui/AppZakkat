@@ -5,6 +5,7 @@ import type { RequestFormData, UploadedDocument, RequestCategory } from "@/types
 import { REQUIRED_DOCS } from "@/types/demandes";
 import type { DocumentVerificationResult } from "@/types/verification";
 import DocumentUploader from "../ui/DocumentUploader";
+import AppIcon from "@/components/ui/AppIcon";
 
 interface Step5Props {
   data: Partial<RequestFormData>;
@@ -208,7 +209,7 @@ export default function Step5Documents({
 
       {/* Privacy note */}
       <div className="flex items-center gap-2 p-3">
-        <span className="text-sm">🔒</span>
+        <AppIcon name="lock" className="h-4 w-4 shrink-0 text-green-deep/50" />
         <p className="font-cairo text-xs text-green-deep/40">
           {isAr
             ? "وثائقك محمية — تُراجع فقط من طرف مسؤول ضياء للتحقق. لن تُشارك مع أي جهة خارجية."

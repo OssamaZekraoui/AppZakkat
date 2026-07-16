@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import AppIcon from "@/components/ui/AppIcon";
 
 const presetAmounts = [3, 5, 10, 20];
 
@@ -21,8 +22,9 @@ export default function SiteDonation() {
       >
         <div className="max-w-4xl mx-auto text-center">
           {/* Badge */}
-          <span className="inline-block bg-gold/20 text-gold font-cairo font-bold text-sm px-4 py-1.5 rounded-full mb-6">
-            🕊️ {t("badge")}
+          <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-gold/20 px-4 py-1.5 text-sm font-bold text-gold font-cairo">
+            <AppIcon name="feather" className="h-4 w-4" />
+            {t("badge")}
           </span>
 
           {/* Title */}
@@ -62,8 +64,9 @@ export default function SiteDonation() {
 
           {/* Transparency note */}
           <div className="bg-white border border-gold/30 rounded-xl p-4 mb-8 max-w-lg mx-auto">
-            <p className="text-gray-600 font-cairo text-sm">
-              ✦ {t("transparencyNote")}
+            <p className="flex items-center justify-center gap-2 text-sm text-gray-600 font-cairo">
+              <AppIcon name="sparkles" className="h-4 w-4 shrink-0 text-gold" />
+              {t("transparencyNote")}
             </p>
           </div>
 
@@ -78,7 +81,7 @@ export default function SiteDonation() {
                 }}
                 className={`px-6 py-3 rounded-xl font-lato font-bold text-lg transition-all min-h-[44px] ${
                   selectedAmount === amount && !customAmount
-                    ? "bg-gold text-green-deep shadow-lg scale-105"
+                    ? "bg-gold text-green-deep shadow-md ring-2 ring-green-deep/15"
                     : "bg-white border border-gold/30 text-green-deep hover:border-gold"
                 }`}
               >
@@ -100,7 +103,8 @@ export default function SiteDonation() {
               onClick={() => setShowModal(true)}
               className="w-full sm:w-auto px-8 py-4 bg-green-deep hover:bg-green-medium text-white font-cairo font-bold rounded-xl transition-all min-h-[44px] flex items-center justify-center gap-2"
             >
-              💳 {t("cardPayment")}
+              <AppIcon name="card" className="h-5 w-5" />
+              {t("cardPayment")}
               <span className="bg-white/20 text-xs px-2 py-0.5 rounded-full">
                 {t("secure")}
               </span>
@@ -109,7 +113,7 @@ export default function SiteDonation() {
               onClick={() => setShowModal(true)}
               className="w-full sm:w-auto px-8 py-4 bg-[#0070ba] hover:bg-[#005ea6] text-white font-cairo font-bold rounded-xl transition-all min-h-[44px] flex items-center justify-center gap-2"
             >
-              🅿 {t("paypal")}
+              {t("paypal")}
               <span className="bg-white/20 text-xs px-2 py-0.5 rounded-full">
                 {t("fast")}
               </span>
@@ -124,9 +128,10 @@ export default function SiteDonation() {
           <div className="bg-white rounded-2xl max-w-md w-full p-6 relative">
             <button
               onClick={() => setShowModal(false)}
-              className="absolute top-4 end-4 text-gray-400 hover:text-gray-600 text-xl min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="absolute end-4 top-4 flex h-11 w-11 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+              aria-label="Fermer"
             >
-              ✕
+              <AppIcon name="close" className="h-5 w-5" />
             </button>
 
             <h3 className="text-green-deep font-amiri text-2xl font-bold mb-2 text-center">
@@ -138,13 +143,14 @@ export default function SiteDonation() {
 
             <div className="space-y-3">
               {/* Stripe button */}
-              <button className="w-full py-3 bg-green-deep hover:bg-green-medium text-white font-cairo font-bold rounded-xl transition-all min-h-[44px]">
-                💳 {t("cardPayment")} (Stripe)
+              <button className="flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-green-deep py-3 font-bold text-white transition-colors hover:bg-green-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold font-cairo">
+                <AppIcon name="card" className="h-5 w-5" />
+                {t("cardPayment")} (Stripe)
               </button>
 
               {/* PayPal button */}
-              <button className="w-full py-3 bg-[#0070ba] hover:bg-[#005ea6] text-white font-cairo font-bold rounded-xl transition-all min-h-[44px]">
-                🅿 PayPal
+              <button className="min-h-11 w-full rounded-lg bg-[#0070ba] py-3 font-bold text-white transition-colors hover:bg-[#005ea6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold font-cairo">
+                PayPal
               </button>
 
               {/* Divider */}
@@ -158,8 +164,9 @@ export default function SiteDonation() {
 
               {/* Bank transfer info */}
               <div className="bg-cream border border-gold/30 rounded-xl p-4">
-                <p className="font-cairo text-sm text-gray-600 mb-2">
-                  🏦 {t("bankTransfer")}
+                <p className="mb-2 flex items-center gap-2 text-sm text-gray-600 font-cairo">
+                  <AppIcon name="building" className="h-4 w-4" />
+                  {t("bankTransfer")}
                 </p>
                 <p className="font-mono text-sm text-gray-700 bg-white rounded-lg px-3 py-2 break-all">
                   FR76 XXXX XXXX XXXX XXXX XXXX XXX
@@ -170,8 +177,9 @@ export default function SiteDonation() {
               </div>
             </div>
 
-            <p className="text-gray-400 text-xs font-cairo text-center mt-4">
-              🔒 Paiement sécurisé — SSL 256-bit
+            <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-gray-400 font-cairo">
+              <AppIcon name="lock" className="h-3.5 w-3.5" />
+              Paiement sécurisé — SSL 256-bit
             </p>
           </div>
         </div>

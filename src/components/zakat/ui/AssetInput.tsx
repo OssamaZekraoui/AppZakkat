@@ -1,6 +1,7 @@
 "use client";
 
 import { pickText } from "../zakatText";
+import AppIcon, { type AppIconName } from "@/components/ui/AppIcon";
 
 interface AssetInputProps {
   label: string;
@@ -8,7 +9,7 @@ interface AssetInputProps {
   labelFr?: string;
   value: number;
   onChange: (value: number) => void;
-  icon?: string;
+  icon?: AppIconName;
   hint?: string;
   suffix?: string;
   locale: string;
@@ -37,7 +38,11 @@ export default function AssetInput({
     <div className="group">
       <label className="block mb-1.5">
         <span className="font-cairo text-sm font-semibold text-green-deep flex items-center gap-2">
-          {icon && <span className="text-base">{icon}</span>}
+          {icon && (
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-pale/60 text-green-deep">
+              <AppIcon name={icon} className="h-4 w-4" />
+            </span>
+          )}
           {displayLabel}
         </span>
       </label>

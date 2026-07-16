@@ -5,6 +5,7 @@ import { useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { CATEGORIES } from "@/types/demandes";
 import { adminText, getAdminLocale, labelFor, statusLabels } from "@/lib/adminText";
+import AppIcon from "@/components/ui/AppIcon";
 
 interface AdminRequest {
   id: string;
@@ -90,8 +91,8 @@ export default function AdminDemandesPage() {
         </div>
       ) : requests.length === 0 ? (
         <div className="rounded-3xl border border-green-deep/8 bg-white p-12 text-center shadow-sm">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-pale text-2xl">
-            📋
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-lg bg-green-pale text-green-deep">
+            <AppIcon name="clipboard" className="h-7 w-7" />
           </div>
           <p className="font-cairo text-lg font-bold text-green-deep/58">{t.noRequests}</p>
         </div>
@@ -109,8 +110,8 @@ export default function AdminDemandesPage() {
               >
                 <div className="flex flex-col gap-4 md:flex-row md:items-center">
                   <div className="flex items-center gap-4 md:flex-1">
-                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-green-pale/70 text-2xl">
-                      {cat?.icon || "📄"}
+                    <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-lg bg-green-pale/70 text-green-deep">
+                      <AppIcon name={cat?.icon || "file"} className="h-6 w-6" />
                     </div>
                     <div className="min-w-0">
                       <div className="mb-1 flex flex-wrap items-center gap-2">

@@ -2,6 +2,7 @@
 
 import type { RequestFormData, AmountBreakdown, UploadedDocument } from "@/types/demandes";
 import { CATEGORIES, COUNTRIES } from "@/types/demandes";
+import AppIcon from "@/components/ui/AppIcon";
 
 interface Step6Props {
   data: Partial<RequestFormData>;
@@ -67,7 +68,7 @@ export default function Step6Review({
         locale={locale}
       >
         <div className="flex items-center gap-2">
-          <span className="text-xl">{cat?.icon}</span>
+          {cat?.icon && <AppIcon name={cat.icon} className="h-5 w-5 text-green-deep" />}
           <span className="font-cairo font-bold text-green-deep">
             {isAr ? cat?.labelAr : cat?.labelFr}
           </span>
@@ -87,8 +88,9 @@ export default function Step6Review({
               ? isAr ? "مجهول الهوية" : "Anonyme"
               : data.displayName || "—"}
           </p>
-          <p>
-            📍 {data.city}, {country?.flag} {isAr ? country?.labelAr : country?.labelFr}
+          <p className="flex items-center gap-1.5">
+            <AppIcon name="location" className="h-4 w-4 shrink-0" />
+            {data.city}, {country?.flag} {isAr ? country?.labelAr : country?.labelFr}
           </p>
         </div>
       </ReviewBlock>
@@ -183,7 +185,7 @@ export default function Step6Review({
         <div className="space-y-1">
           {documents.map((doc) => (
             <div key={doc.id} className="flex items-center gap-2 text-sm">
-              <span>{doc.mimeType.startsWith("image/") ? "🖼️" : "📄"}</span>
+              <AppIcon name={doc.mimeType.startsWith("image/") ? "file-image" : "file"} className="h-4 w-4 shrink-0 text-green-deep/50" />
               <span className="font-lato text-green-deep/60 truncate">
                 {doc.originalName}
               </span>
