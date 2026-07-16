@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import AppIcon, { type AppIconName } from "@/components/ui/AppIcon";
 
@@ -79,7 +79,9 @@ function CauseCard({
   cause: (typeof demoCauses)[number];
 }) {
   const t = useTranslations("causes");
+  const locale = useLocale();
   const [copied, setCopied] = useState(false);
+  const numberLocale = locale === "ar" ? "ar-MA" : locale === "en" ? "en-GB" : "fr-FR";
 
   const progress = Math.round((cause.currentAmount / cause.targetAmount) * 100);
 
@@ -122,10 +124,10 @@ function CauseCard({
       <div className="px-5 mb-4">
         <div className="flex items-center justify-between text-sm font-cairo mb-1">
           <span className="text-green-medium font-bold">
-            {t("raised")} {cause.currentAmount.toLocaleString()}
+            {t("raised")} {cause.currentAmount.toLocaleString(numberLocale)}
           </span>
           <span className="text-gray-400">
-            {t("of")} {cause.targetAmount.toLocaleString()}
+            {t("of")} {cause.targetAmount.toLocaleString(numberLocale)}
           </span>
         </div>
         <div className="w-full h-2 bg-green-pale rounded-full overflow-hidden">
