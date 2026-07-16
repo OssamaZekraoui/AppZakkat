@@ -3,7 +3,6 @@
 import { useTranslations, useLocale } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import AppIcon from "@/components/ui/AppIcon";
 
 const AUTH_TOKEN_KEY = "diyae-auth-token";
@@ -44,17 +43,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="group flex items-center gap-2">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-white-off p-1 shadow-sm ring-1 ring-gold/25">
-              <Image
-                src="/diyae-logo.png"
-                alt=""
-                width={44}
-                height={44}
-                className="h-full w-full object-contain"
-                priority
-              />
-            </span>
+          <Link href="/" className="group flex items-center">
             {locale === "ar" ? (
               <span className="relative select-none">
                 <span className="text-gold font-amiri text-3xl sm:text-4xl font-bold drop-shadow-[0_0_8px_rgba(201,168,76,0.4)] group-hover:drop-shadow-[0_0_12px_rgba(201,168,76,0.6)] transition-all duration-300">
