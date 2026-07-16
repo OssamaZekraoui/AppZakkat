@@ -6,8 +6,12 @@ export const metadata: Metadata = {
   title: "ضياء — Diyae",
   description: "منصة إسلامية غير ربحية للزكاة والتبرعات والتضامن المجتمعي",
   icons: {
-    icon: "/diyae-logo.png",
-    apple: "/diyae-logo.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: { url: "/apple-icon.png", type: "image/png", sizes: "180x180" },
   },
   openGraph: {
     title: "ضياء — Diyae",
