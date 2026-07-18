@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/diyae-logo.png",
+        url: "/diyae-logo.png?v=2",
         width: 1024,
         height: 1024,
         alt: "شعار ضياء — Diyae",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     card: "summary",
     title: "ضياء — Diyae",
     description: "منصة إسلامية غير ربحية للزكاة والتبرعات والتضامن المجتمعي",
-    images: ["/diyae-logo.png"],
+    images: ["/diyae-logo.png?v=2"],
   },
 };
 
