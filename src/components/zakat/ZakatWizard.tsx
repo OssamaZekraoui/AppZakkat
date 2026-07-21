@@ -26,6 +26,7 @@ import { pickText } from "./zakatText";
 
 const TOTAL_STEPS = 8;
 const STORAGE_KEY = "diyae-zakat-draft";
+const AUTH_TOKEN_KEY = "diyae-auth-token";
 
 interface WizardState {
   currentStep: number;
@@ -134,7 +135,7 @@ export default function ZakatWizard({ locale }: ZakatWizardProps) {
     []
   );
 
-  const goNext = () => {
+  const goNext = async () => {
     if (state.currentStep === 6) {
       // Calculate before showing results
       const prices = state.metalPrices || getFallbackPrices();
@@ -148,6 +149,26 @@ export default function ZakatWizard({ locale }: ZakatWizardProps) {
         exchangeRates: state.exchangeRates,
       });
       setState((prev) => ({ ...prev, currentStep: 7, result }));
+      const token = localStorage.getItem(AUTH_TOKEN_KEY);
+      if (token) {
+        try {
+          await fetch("/api/zakat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify({
+              assets: state.assets,
+              currency: state.currency,
+              nisabType: state.nisabType,
+              school: state.school,
+              hawlStart: state.hawlStart,
+              metalPrices: prices,
+              exchangeRates: state.exchangeRates,
+            }),
+          });
+        } catch {
+          // The result remains usable locally if persistence is temporarily unavailable.
+        }
+      }
     } else {
       setState((prev) => ({
         ...prev,

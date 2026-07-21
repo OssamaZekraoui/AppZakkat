@@ -94,13 +94,10 @@ export default function Navbar() {
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-2">
               {isAuthenticated ? (
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="rounded-full border border-gold/35 px-4 py-2 font-cairo text-sm font-bold text-white transition hover:bg-white/10"
-                >
-                  {t("logout")}
-                </button>
+                <>
+                  <Link href="/espace" className="rounded-full bg-gold px-4 py-2 font-cairo text-sm font-black text-green-deep transition hover:bg-gold-light">{t("profile")}</Link>
+                  <button type="button" onClick={handleLogout} className="rounded-full border border-gold/35 px-4 py-2 font-cairo text-sm font-bold text-white transition hover:bg-white/10">{t("logout")}</button>
+                </>
               ) : (
                 <>
                   <Link
@@ -184,13 +181,7 @@ export default function Navbar() {
 
           <div className="border-t border-gold/15 pt-3">
             {isAuthenticated ? (
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="w-full rounded-xl border border-gold/35 px-4 py-3 text-center font-cairo font-bold text-white"
-              >
-                {t("logout")}
-              </button>
+              <div className="grid grid-cols-2 gap-2"><Link href="/espace" onClick={() => setMobileOpen(false)} className="rounded-xl bg-gold px-4 py-3 text-center font-cairo font-black text-green-deep">{t("profile")}</Link><button type="button" onClick={handleLogout} className="rounded-xl border border-gold/35 px-4 py-3 text-center font-cairo font-bold text-white">{t("logout")}</button></div>
             ) : (
               <div className="grid grid-cols-2 gap-2">
                 <Link
