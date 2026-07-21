@@ -56,6 +56,27 @@ npm run dev
 
 Le site est accessible sur http://localhost:3000
 
+## 6. Charger la simulation demandeur → validation admin
+
+```bash
+npm run db:seed:demo
+```
+
+Cette commande crée une demande en attente qui n'est pas visible sur le site public.
+
+| Rôle | Identifiant | Mot de passe |
+|---|---|---|
+| Demandeur | `demandeur@zakkat.demo` | `Demandeur2026!` |
+| Administrateur | `admin@zakkat.demo` | `AdminZakkat2026!` |
+
+Scénario de vérification :
+
+1. Se connecter comme demandeur et créer une nouvelle demande depuis `/fr/demandes/nouvelle` (ou utiliser la demande `SIMULATION-PENDING-001` déjà créée).
+2. Vérifier qu'elle ne figure pas dans `/fr/demandes` tant qu'elle est en attente.
+3. Se déconnecter, puis se connecter avec le compte administrateur.
+4. Ouvrir **Administration → Demandes**, sélectionner la demande et cliquer sur **Approuver**.
+5. Revenir sur `/fr/demandes` : la demande approuvée est maintenant publiée.
+
 ## Commandes utiles
 
 | Commande | Description |

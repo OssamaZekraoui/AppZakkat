@@ -63,6 +63,7 @@ export const adminText = {
     approved: "تم القبول",
     rejected: "تم الرفض",
     reviewNotesPlaceholder: "ملاحظات المراجعة...",
+    logout: "تسجيل الخروج",
   },
   fr: {
     brand: "Diyae",
@@ -122,6 +123,7 @@ export const adminText = {
     approved: "Approuvé",
     rejected: "Rejeté",
     reviewNotesPlaceholder: "Notes d'examen...",
+    logout: "Déconnexion",
   },
   en: {
     brand: "Diyae",
@@ -181,6 +183,7 @@ export const adminText = {
     approved: "Approved",
     rejected: "Rejected",
     reviewNotesPlaceholder: "Review notes...",
+    logout: "Logout",
   },
 } as const;
 

@@ -1,14 +1,35 @@
+import Decimal from "decimal.js";
 import type {
+  Currency,
+  MetalPrices,
+  NisabType,
+  ZakatAssets,
+  ZakatBreakdown,
   ZakatInput,
   ZakatResult,
-  ZakatBreakdown,
   ZakatSchool,
-  ZakatAssets,
-  MetalPrices,
-  Currency,
+  ZakatWarning,
 } from "./types";
-import { SCHOOL_RULES, NISAB_WEIGHTS, LUNAR_YEAR_DAYS, ZAKAT_RATE } from "./schools";
-import { getGoldNisabValue, getSilverNisabValue } from "./nisab";
+import { SCHOOL_RULES, NISAB_WEIGHTS, ZAKAT_RATE } from "./schools";
+import {
+  convertPriceToCurrency,
+  getGoldNisabValue,
+  getSilverNisabValue,
+} from "./nisab";
+import { getHawlStatus } from "./hawl";
+import { parseZakatInput, ZakatValidationError } from "./validation";
+
+type CalculationOptions = {
+  asOf?: string | Date;
+};
+
+function decimal(value: number): Decimal {
+  return new Decimal(value);
+}
+
+function roundMoney(value: Decimal): number {
+  return value.toDecimalPlaces(2, Decimal.ROUND_HALF_UP).toNumber();
+}
 
 function convertMetalToValue(
   grams: number,
@@ -17,10 +38,15 @@ function convertMetalToValue(
   currency: Currency,
   exchangeRates: Record<Currency, number>
 ): number {
-  const priceEur =
+  const sourcePrice =
     metalType === "gold" ? metalPrices.goldPerGram : metalPrices.silverPerGram;
-  const rate = exchangeRates[currency] || 1;
-  return grams * priceEur * rate;
+  const targetPrice = convertPriceToCurrency(
+    sourcePrice,
+    metalPrices.currency,
+    currency,
+    exchangeRates
+  );
+  return decimal(grams).mul(targetPrice).toNumber();
 }
 
 function computeBreakdown(
@@ -31,7 +57,6 @@ function computeBreakdown(
   exchangeRates: Record<Currency, number>
 ): ZakatBreakdown[] {
   const rules = SCHOOL_RULES[school];
-
   const goldValue = convertMetalToValue(
     assets.goldGrams,
     "gold",
@@ -54,8 +79,7 @@ function computeBreakdown(
     exchangeRates
   );
 
-  const breakdown: ZakatBreakdown[] = [
-    // Cash
+  return [
     { category: "Cash", categoryAr: "نقد", amount: assets.cash, isZakatable: true },
     {
       category: "Bank accounts",
@@ -63,233 +87,202 @@ function computeBreakdown(
       amount: assets.bankAccounts,
       isZakatable: true,
     },
+    { category: "Savings", categoryAr: "توفير", amount: assets.savings, isZakatable: true },
+    { category: "Gold", categoryAr: "ذهب", amount: goldValue, isZakatable: true },
+    { category: "Silver", categoryAr: "فضة", amount: silverValue, isZakatable: true },
     {
-      category: "Savings",
-      categoryAr: "توفير",
-      amount: assets.savings,
-      isZakatable: true,
-    },
-    // Metals
-    {
-      category: "Gold",
-      categoryAr: "ذهب",
-      amount: goldValue,
-      isZakatable: true,
-    },
-    {
-      category: "Silver",
-      categoryAr: "فضة",
-      amount: silverValue,
-      isZakatable: true,
-    },
-    {
-      category: "Gold jewelry",
-      categoryAr: "حلي ذهبية",
+      category: "Personal-use gold jewelry",
+      categoryAr: "حلي ذهبية للاستعمال الشخصي",
       amount: jewelryValue,
       isZakatable: rules.goldJewelryZakatable,
       note: rules.goldJewelryZakatable
         ? undefined
-        : "Non zakatable selon cette école",
+        : "Personal-use jewelry is excluded for this school; jewelry held for trade must be entered as business inventory.",
     },
-    // Investments
     {
-      category: "Halal stocks",
-      categoryAr: "أسهم حلال",
+      category: "Zakatable portion of stocks",
+      categoryAr: "الجزء الخاضع للزكاة من الأسهم",
       amount: assets.halalStocks,
       isZakatable: true,
     },
     {
-      category: "Islamic funds",
-      categoryAr: "صناديق إسلامية",
+      category: "Zakatable portion of Islamic funds",
+      categoryAr: "الجزء الخاضع للزكاة من الصناديق الإسلامية",
       amount: assets.islamicFunds,
       isZakatable: true,
     },
+    { category: "Dividends held", categoryAr: "أرباح محتفظ بها", amount: assets.dividends, isZakatable: true },
     {
-      category: "Dividends",
-      categoryAr: "أرباح",
-      amount: assets.dividends,
-      isZakatable: true,
-    },
-    {
-      category: "Crypto (halal)",
-      categoryAr: "عملات رقمية",
+      category: "Crypto treated as zakatable",
+      categoryAr: "عملات رقمية محتسبة للزكاة",
       amount: assets.cryptoHalal,
       isZakatable: true,
-      note: "اختلف العلماء في حكم زكاة العملات الرقمية",
     },
-    // Business
     {
-      category: "Business inventory",
-      categoryAr: "عروض تجارة",
+      category: "Business inventory for resale",
+      categoryAr: "مخزون تجاري معد للبيع",
       amount: assets.businessInventory,
       isZakatable: true,
     },
     {
-      category: "Business receivables",
-      categoryAr: "ديون تجارية مستحقة",
+      category: "Recoverable business receivables",
+      categoryAr: "ديون تجارية مرجوة السداد",
       amount: assets.businessReceivables,
       isZakatable: true,
     },
-    // Other income
     {
-      category: "Loans given",
-      categoryAr: "قروض حسنة",
+      category: "Recoverable loans given",
+      categoryAr: "قروض مرجوة السداد",
       amount: assets.loansGiven,
       isZakatable: true,
     },
     {
-      category: "Rental income",
-      categoryAr: "إيرادات إيجارية",
+      category: "Accumulated rental income",
+      categoryAr: "إيرادات إيجارية متراكمة",
       amount: assets.rentalIncome,
       isZakatable: true,
     },
-    // Deductions
     {
-      category: "Short-term debts",
-      categoryAr: "ديون قصيرة الأجل",
+      category: "Debts due within 12 months",
+      categoryAr: "ديون مستحقة خلال اثني عشر شهرا",
       amount: -assets.shortTermDebts,
       isZakatable: true,
     },
     {
-      category: "Essential expenses",
-      categoryAr: "مصاريف أساسية",
+      category: "Immediate essential outgoings",
+      categoryAr: "مصاريف أساسية مستحقة فورا",
       amount: -assets.essentialExpenses,
       isZakatable: true,
     },
   ];
+}
 
-  return breakdown;
+function sumBreakdown(
+  breakdown: ZakatBreakdown[],
+  predicate: (item: ZakatBreakdown) => boolean
+): Decimal {
+  return breakdown.reduce(
+    (sum, item) => (predicate(item) ? sum.plus(item.amount) : sum),
+    new Decimal(0)
+  );
+}
+
+function nisabValue(
+  nisabType: NisabType,
+  metalPrices: MetalPrices,
+  currency: Currency,
+  exchangeRates: Record<Currency, number>
+): number {
+  return nisabType === "gold"
+    ? getGoldNisabValue(metalPrices, currency, exchangeRates)
+    : getSilverNisabValue(metalPrices, currency, exchangeRates);
 }
 
 function computeForSchool(
   assets: ZakatAssets,
   school: ZakatSchool,
+  nisabType: NisabType,
   metalPrices: MetalPrices,
   currency: Currency,
   exchangeRates: Record<Currency, number>,
   hawlCompleted: boolean
 ): number {
-  const rules = SCHOOL_RULES[school];
   const breakdown = computeBreakdown(assets, school, metalPrices, currency, exchangeRates);
+  const netAssets = Decimal.max(
+    0,
+    sumBreakdown(breakdown, (item) => item.isZakatable)
+  );
+  const threshold = decimal(
+    nisabValue(nisabType, metalPrices, currency, exchangeRates)
+  );
 
-  const totalZakatable = breakdown
-    .filter((b) => b.isZakatable)
-    .reduce((sum, b) => sum + b.amount, 0);
-
-  // Agricultural output uses different rate and doesn't require hawl
-  const agriculturalZakat = assets.agriculturalOutput * rules.agriculturalRate.natural;
-
-  const nisabType = rules.nisabReference;
-  const nisabValue =
-    nisabType === "gold"
-      ? getGoldNisabValue(metalPrices, currency, exchangeRates)
-      : getSilverNisabValue(metalPrices, currency, exchangeRates);
-
-  const netAssets = totalZakatable;
-  const nisabMet = netAssets >= nisabValue;
-
-  let zakatAmount = 0;
-  if (nisabMet && hawlCompleted) {
-    zakatAmount = netAssets * ZAKAT_RATE;
-  }
-
-  // Agricultural zakat is independent of hawl
-  zakatAmount += agriculturalZakat;
-
-  return Math.max(0, Math.round(zakatAmount * 100) / 100);
+  if (!hawlCompleted || netAssets.lessThan(threshold)) return 0;
+  return roundMoney(netAssets.mul(ZAKAT_RATE));
 }
 
-export function calculateZakat(input: ZakatInput): ZakatResult {
-  const { assets, currency, school, hawlStart, metalPrices, exchangeRates } = input;
-  const rules = SCHOOL_RULES[school];
+function collectWarnings(input: ZakatInput): ZakatWarning[] {
+  const warnings: ZakatWarning[] = [];
+  if (input.metalPrices.source === "fallback") warnings.push("fallback_metal_prices");
+  if (input.assets.agriculturalOutput > 0) warnings.push("agriculture_not_included");
+  if (input.assets.halalStocks > 0 || input.assets.islamicFunds > 0) {
+    warnings.push("investment_method_review");
+  }
+  if (input.assets.cryptoHalal > 0) warnings.push("crypto_review");
+  return warnings;
+}
 
-  // Hawl calculation
-  const hawlStartDate = new Date(hawlStart);
-  const today = new Date();
-  const diffMs = today.getTime() - hawlStartDate.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  const hawlCompleted = diffDays >= LUNAR_YEAR_DAYS;
-  const daysUntilHawl = hawlCompleted ? 0 : LUNAR_YEAR_DAYS - diffDays;
-
-  const hawlEndDate = new Date(hawlStartDate);
-  hawlEndDate.setDate(hawlEndDate.getDate() + LUNAR_YEAR_DAYS);
-
-  // Breakdown for chosen school
+export function calculateZakat(
+  rawInput: unknown,
+  options: CalculationOptions = {}
+): ZakatResult {
+  const input = parseZakatInput(rawInput);
+  const { assets, currency, school, nisabType, metalPrices, exchangeRates } = input;
+  const asOf = options.asOf ?? new Date();
+  const hawl = getHawlStatus(input.hawlStart, asOf);
   const breakdown = computeBreakdown(assets, school, metalPrices, currency, exchangeRates);
 
-  const totalGross = breakdown
-    .filter((b) => b.amount > 0)
-    .reduce((sum, b) => sum + b.amount, 0);
+  const totalGross = sumBreakdown(breakdown, (item) => item.amount > 0);
+  const totalDeductions = decimal(assets.shortTermDebts).plus(assets.essentialExpenses);
+  const netZakatable = Decimal.max(
+    0,
+    sumBreakdown(breakdown, (item) => item.isZakatable)
+  );
 
-  const totalDeductions = assets.shortTermDebts + assets.essentialExpenses;
+  const goldNisabValue = decimal(
+    getGoldNisabValue(metalPrices, currency, exchangeRates)
+  );
+  const silverNisabValue = decimal(
+    getSilverNisabValue(metalPrices, currency, exchangeRates)
+  );
+  const threshold = nisabType === "gold" ? goldNisabValue : silverNisabValue;
+  const nisabMet = netZakatable.greaterThanOrEqualTo(threshold);
+  const zakatDue = nisabMet && hawl.completed;
+  const zakatAmount = zakatDue ? roundMoney(netZakatable.mul(ZAKAT_RATE)) : 0;
 
-  const netZakatableAssets = breakdown
-    .filter((b) => b.isZakatable)
-    .reduce((sum, b) => sum + b.amount, 0);
-
-  // Nisab
-  const nisabType = rules.nisabReference;
-  const goldNisabValue = getGoldNisabValue(metalPrices, currency, exchangeRates);
-  const silverNisabValue = getSilverNisabValue(metalPrices, currency, exchangeRates);
-  const nisabThreshold =
-    nisabType === "gold" ? goldNisabValue : silverNisabValue;
-  const nisabMet = netZakatableAssets >= nisabThreshold;
-
-  // Main zakat
-  let zakatAmount = 0;
-  if (nisabMet && hawlCompleted) {
-    zakatAmount = netZakatableAssets * ZAKAT_RATE;
-  }
-
-  // Agricultural zakat (independent of hawl)
-  const agriculturalZakat =
-    assets.agriculturalOutput * rules.agriculturalRate.natural;
-  zakatAmount += agriculturalZakat;
-  zakatAmount = Math.max(0, Math.round(zakatAmount * 100) / 100);
-
-  const zakatDue = zakatAmount > 0;
-
-  // School comparison
   const schools: ZakatSchool[] = ["hanafi", "maliki", "shafiite", "hanbalite"];
   const schoolComparison = {} as Record<ZakatSchool, number>;
-  for (const s of schools) {
-    schoolComparison[s] = computeForSchool(
+  for (const comparisonSchool of schools) {
+    schoolComparison[comparisonSchool] = computeForSchool(
       assets,
-      s,
+      comparisonSchool,
+      nisabType,
       metalPrices,
       currency,
       exchangeRates,
-      hawlCompleted
+      hawl.completed
     );
   }
 
+  const calculationDate = new Date(asOf);
+  if (!Number.isFinite(calculationDate.getTime())) {
+    throw new ZakatValidationError("Invalid calculation date");
+  }
+
   return {
-    totalGrossAssets: Math.round(totalGross * 100) / 100,
-    totalDeductions: Math.round(totalDeductions * 100) / 100,
-    netZakatableAssets: Math.round(netZakatableAssets * 100) / 100,
-    nisabThreshold: Math.round(nisabThreshold * 100) / 100,
+    totalGrossAssets: roundMoney(totalGross),
+    totalDeductions: roundMoney(totalDeductions),
+    netZakatableAssets: roundMoney(netZakatable),
+    nisabThreshold: roundMoney(threshold),
     nisabMet,
     nisabType,
-    goldNisabValue: Math.round(goldNisabValue * 100) / 100,
-    silverNisabValue: Math.round(silverNisabValue * 100) / 100,
-    hawlStart: hawlStartDate.toISOString(),
-    hawlEnd: hawlEndDate.toISOString(),
-    hawlCompleted,
-    daysUntilHawl: hawlCompleted ? undefined : daysUntilHawl,
+    goldNisabValue: roundMoney(goldNisabValue),
+    silverNisabValue: roundMoney(silverNisabValue),
+    hawlStart: hawl.start.toISOString(),
+    hawlEnd: hawl.end.toISOString(),
+    hawlCompleted: hawl.completed,
+    daysUntilHawl: hawl.completed ? undefined : hawl.daysUntilCompletion,
     zakatDue,
     zakatAmount,
     zakatRate: ZAKAT_RATE,
-    breakdown,
+    breakdown: breakdown.map((item) => ({ ...item, amount: roundMoney(decimal(item.amount)) })),
     schoolComparison,
     school,
     currency,
-    calculatedAt: new Date().toISOString(),
+    calculatedAt: calculationDate.toISOString(),
+    warnings: collectWarnings(input),
   };
 }
 
-/**
- * Quick calculation for the teaser widget (simplified)
- */
 export function quickZakatCalc(
   cash: number,
   goldGrams: number,
@@ -297,9 +290,18 @@ export function quickZakatCalc(
   goldPricePerGram: number,
   silverPricePerGram: number
 ): number {
-  const total =
-    cash + goldGrams * goldPricePerGram + silverGrams * silverPricePerGram;
-  const nisab = NISAB_WEIGHTS.gold * goldPricePerGram;
-  if (total < nisab) return 0;
-  return Math.round(total * ZAKAT_RATE * 100) / 100;
+  const values = [cash, goldGrams, silverGrams, goldPricePerGram, silverPricePerGram];
+  if (values.some((value) => !Number.isFinite(value) || value < 0)) {
+    throw new ZakatValidationError("Quick calculator values must be finite and non-negative");
+  }
+  if (goldPricePerGram === 0 || silverPricePerGram === 0) {
+    throw new ZakatValidationError("Metal prices must be greater than zero");
+  }
+
+  const total = decimal(cash)
+    .plus(decimal(goldGrams).mul(goldPricePerGram))
+    .plus(decimal(silverGrams).mul(silverPricePerGram));
+  const threshold = decimal(NISAB_WEIGHTS.gold).mul(goldPricePerGram);
+  if (total.lessThan(threshold)) return 0;
+  return roundMoney(total.mul(ZAKAT_RATE));
 }

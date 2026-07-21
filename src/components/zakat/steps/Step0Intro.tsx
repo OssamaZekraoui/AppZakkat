@@ -1,6 +1,6 @@
 "use client";
 
-import type { Currency, MetalPrices, ZakatSchool } from "@/lib/zakat/types";
+import type { Currency, MetalPrices, NisabType, ZakatSchool } from "@/lib/zakat/types";
 import NisabCard from "../ui/NisabCard";
 import SchoolSelector from "../ui/SchoolSelector";
 import CurrencySelector from "../ui/CurrencySelector";
@@ -9,6 +9,8 @@ import { pickText } from "../zakatText";
 interface Step0Props {
   currency: Currency;
   onCurrencyChange: (c: Currency) => void;
+  nisabType: NisabType;
+  onNisabTypeChange: (type: NisabType) => void;
   school: ZakatSchool;
   onSchoolChange: (s: ZakatSchool) => void;
   metalPrices: MetalPrices | null;
@@ -19,6 +21,8 @@ interface Step0Props {
 export default function Step0Intro({
   currency,
   onCurrencyChange,
+  nisabType,
+  onNisabTypeChange,
   school,
   onSchoolChange,
   metalPrices,
@@ -61,6 +65,8 @@ export default function Step0Intro({
         metalPrices={metalPrices}
         currency={currency}
         exchangeRates={exchangeRates}
+        selectedType={nisabType}
+        onTypeChange={onNisabTypeChange}
         locale={locale}
       />
 

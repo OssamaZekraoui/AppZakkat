@@ -1,36 +1,21 @@
-import type { NisabType, ZakatSchool } from "./types";
+import type { ZakatSchool } from "./types";
 
 export interface SchoolRules {
-  nisabReference: NisabType;
   goldJewelryZakatable: boolean;
-  businessStockMethod: "market_value" | "cost_or_market";
-  agriculturalRate: { irrigated: number; natural: number };
 }
 
 export const SCHOOL_RULES: Record<ZakatSchool, SchoolRules> = {
   hanafi: {
-    nisabReference: "silver",
-    goldJewelryZakatable: false,
-    businessStockMethod: "market_value",
-    agriculturalRate: { irrigated: 0.05, natural: 0.1 },
+    goldJewelryZakatable: true,
   },
   maliki: {
-    nisabReference: "gold",
-    goldJewelryZakatable: true,
-    businessStockMethod: "market_value",
-    agriculturalRate: { irrigated: 0.05, natural: 0.1 },
+    goldJewelryZakatable: false,
   },
   shafiite: {
-    nisabReference: "gold",
     goldJewelryZakatable: false,
-    businessStockMethod: "cost_or_market",
-    agriculturalRate: { irrigated: 0.05, natural: 0.1 },
   },
   hanbalite: {
-    nisabReference: "gold",
-    goldJewelryZakatable: true,
-    businessStockMethod: "market_value",
-    agriculturalRate: { irrigated: 0.05, natural: 0.1 },
+    goldJewelryZakatable: false,
   },
 };
 

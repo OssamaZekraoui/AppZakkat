@@ -1,35 +1,35 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import { Link, usePathname } from "@/i18n/navigation";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { adminText, getAdminLocale } from "@/lib/adminText";
 import AppIcon, { type AppIconName } from "@/components/ui/AppIcon";
 
-function Icon({ name }: { name: "home" | "requests" | "donations" | "users" | "back" }) {
-  const icons: Record<typeof name, AppIconName> = {
-    home: "dashboard",
-    requests: "file",
-    donations: "hand-heart",
-    users: "users",
-    back: "arrow-left",
-  };
-
-  return <AppIcon name={icons[name]} className="h-5 w-5" />;
-}
+const AUTH_TOKEN_KEY = "diyae-auth-token";
+const AUTH_USER_KEY = "diyae-auth-user";
 
 export function AdminClientLayout({ children }: { children: React.ReactNode }) {
   const locale = useLocale();
   const pathname = usePathname();
+  const router = useRouter();
   const currentLocale = getAdminLocale(locale);
   const t = adminText[currentLocale];
   const isAr = currentLocale === "ar";
 
   const navItems = [
-    { href: "/admin", label: t.dashboard, icon: "home" as const },
-    { href: "/admin/demandes", label: t.requests, icon: "requests" as const },
-    { href: "/admin/donations", label: t.donations, icon: "donations" as const },
-    { href: "/admin/users", label: t.users, icon: "users" as const },
+    { href: "/admin", label: t.dashboard, icon: "dashboard" as AppIconName },
+    { href: "/admin/demandes", label: t.requests, icon: "file" as AppIconName },
+    { href: "/admin/donations", label: t.donations, icon: "hand-heart" as AppIconName },
+    { href: "/admin/users", label: t.users, icon: "users" as AppIconName },
   ];
+
+  async function handleLogout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    localStorage.removeItem(AUTH_USER_KEY);
+    router.replace("/login");
+    router.refresh();
+  }
 
   return (
     <div className="min-h-screen bg-white-off text-green-deep" dir={isAr ? "rtl" : "ltr"}>
@@ -63,7 +63,7 @@ export function AdminClientLayout({ children }: { children: React.ReactNode }) {
                     : "text-white/72 hover:bg-white/8 hover:text-white"
                 }`}
               >
-                <Icon name={item.icon} />
+                <AppIcon name={item.icon} className="h-5 w-5" />
                 <span>{item.label}</span>
               </Link>
             );
@@ -71,13 +71,14 @@ export function AdminClientLayout({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="relative border-t border-gold/20 p-4">
-          <Link
-            href="/"
-            className="flex min-h-11 items-center gap-2 rounded-lg px-4 py-3 font-cairo text-sm font-bold text-white/62 transition-colors hover:bg-white/8 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex min-h-11 w-full items-center gap-2 rounded-lg px-4 py-3 font-cairo text-sm font-bold text-white/72 transition-colors hover:bg-white/8 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
           >
-            <Icon name="back" />
-            <span>{t.backToSite}</span>
-          </Link>
+            <AppIcon name="logout" className="h-5 w-5" />
+            <span>{t.logout}</span>
+          </button>
         </div>
       </aside>
 
@@ -87,12 +88,13 @@ export function AdminClientLayout({ children }: { children: React.ReactNode }) {
             <Link href="/admin" className="font-amiri text-2xl font-bold text-green-deep">
               {t.brand}
             </Link>
-            <Link
-              href="/"
+            <button
+              type="button"
+              onClick={handleLogout}
               className="rounded-full border border-green-deep/10 bg-white px-4 py-2 font-cairo text-xs font-bold text-green-deep shadow-sm"
             >
-              {t.backToSite}
-            </Link>
+              {t.logout}
+            </button>
           </div>
           <nav className="mt-3 flex gap-2 overflow-x-auto pb-1">
             {navItems.map((item) => (

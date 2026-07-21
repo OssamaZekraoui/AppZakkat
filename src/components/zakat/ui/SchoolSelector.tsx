@@ -14,36 +14,36 @@ const SCHOOLS: SchoolOption[] = [
     value: "maliki",
     label: { ar: "مالكي", fr: "Malikite", en: "Maliki" },
     desc: {
-      ar: "مذهب المغرب وإفريقيا",
-      fr: "Madhab du Maghreb et de l'Afrique",
-      en: "School common in the Maghreb and Africa",
+      ar: "حلي الاستعمال الشخصي غير محتسبة",
+      fr: "Bijoux d'usage personnel non compt\u00e9s",
+      en: "Personal-use jewelry is excluded",
     },
   },
   {
     value: "hanafi",
     label: { ar: "حنفي", fr: "Hanafite", en: "Hanafi" },
     desc: {
-      ar: "نصاب الفضة — أيسر للفقراء",
-      fr: "Nisab argent — plus accessible",
-      en: "Silver nisab — more accessible",
+      ar: "حلي الذهب والفضة محتسبة",
+      fr: "Bijoux en or et argent compt\u00e9s",
+      en: "Gold and silver jewelry is included",
     },
   },
   {
     value: "shafiite",
     label: { ar: "شافعي", fr: "Chaféite", en: "Shafi'i" },
     desc: {
-      ar: "نصاب الذهب — المذهب الأوسع",
-      fr: "Nisab or — madhab majoritaire",
-      en: "Gold nisab — widely followed",
+      ar: "حلي الاستعمال الشخصي غير محتسبة",
+      fr: "Bijoux d'usage personnel non compt\u00e9s",
+      en: "Personal-use jewelry is excluded",
     },
   },
   {
     value: "hanbalite",
     label: { ar: "حنبلي", fr: "Hanbalite", en: "Hanbali" },
     desc: {
-      ar: "المذهب المحافظ — الجزيرة العربية",
-      fr: "Madhab conservateur — Arabie",
-      en: "Conservative school — Arabian Peninsula",
+      ar: "حلي الاستعمال الشخصي غير محتسبة",
+      fr: "Bijoux d'usage personnel non compt\u00e9s",
+      en: "Personal-use jewelry is excluded",
     },
   },
 ];

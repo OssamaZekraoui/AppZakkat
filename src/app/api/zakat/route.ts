@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
-import { calculateTotalAssets, calculateZakat } from "@/lib/zakat";
+import { calculateZakat } from "@/lib/zakat/calculator";
+import { parseZakatInput, ZakatValidationError } from "@/lib/zakat/validation";
+import type { ZakatSchool } from "@/lib/zakat/types";
 
 function getUserIdFromRequest(request: NextRequest): string | null {
   const authHeader = request.headers.get("authorization");
@@ -15,12 +17,12 @@ function getUserIdFromRequest(request: NextRequest): string | null {
   }
 }
 
-function getHawlDates(year: number) {
-  const hawlStart = new Date(Date.UTC(year, 0, 1));
-  const hawlEnd = new Date(hawlStart);
-  hawlEnd.setUTCDate(hawlEnd.getUTCDate() + 354);
-  return { hawlStart, hawlEnd };
-}
+const SCHOOL_TO_DB: Record<ZakatSchool, "HANAFI" | "MALIKI" | "SHAFIITE" | "HANBALITE"> = {
+  hanafi: "HANAFI",
+  maliki: "MALIKI",
+  shafiite: "SHAFIITE",
+  hanbalite: "HANBALITE",
+};
 
 export async function GET(request: NextRequest) {
   const userId = getUserIdFromRequest(request);
@@ -44,50 +46,46 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
-    const {
-      goldValue = 0,
-      silverValue = 0,
-      cashValue = 0,
-      stocksValue = 0,
-      debts = 0,
-      nisabValue,
-      year,
-      currency = "MAD",
-    } = body;
-
-    if (!nisabValue || !year) {
-      return NextResponse.json(
-        { success: false, error: "nisabValue and year are required" },
-        { status: 400 }
-      );
-    }
-
-    const totalAssets = calculateTotalAssets({ goldValue, silverValue, cashValue, stocksValue });
-    const netAssets = Math.max(0, totalAssets - Number(debts));
-    const zakatAmount = calculateZakat(netAssets, Number(nisabValue));
-    const { hawlStart, hawlEnd } = getHawlDates(Number(year));
+    const body: unknown = await request.json();
+    const input = parseZakatInput(body);
+    const result = calculateZakat(input);
 
     const record = await prisma.zakatCalculation.create({
       data: {
         userId,
-        currency,
-        nisabType: "GOLD",
-        goldPrice: goldValue,
-        silverPrice: silverValue,
-        totalAssets,
-        debts,
-        netAssets,
-        zakatAmount,
-        hawlStart,
-        hawlEnd,
-        school: "MALIKI",
+        currency: result.currency,
+        nisabType: result.nisabType === "gold" ? "GOLD" : "SILVER",
+        goldPrice: input.metalPrices.goldPerGram,
+        silverPrice: input.metalPrices.silverPerGram,
+        totalAssets: result.totalGrossAssets,
+        debts: result.totalDeductions,
+        netAssets: result.netZakatableAssets,
+        zakatAmount: result.zakatAmount,
+        hawlStart: new Date(result.hawlStart),
+        hawlEnd: new Date(result.hawlEnd),
+        school: SCHOOL_TO_DB[result.school],
+        items: {
+          create: result.breakdown
+            .filter((item) => item.amount !== 0)
+            .map((item) => ({
+              category: item.category,
+              amount: item.amount,
+              amountBase: item.amount,
+              notes: item.note,
+            })),
+        },
       },
       include: { items: true },
     });
 
     return NextResponse.json({ success: true, data: record }, { status: 201 });
   } catch (error) {
+    if (error instanceof ZakatValidationError) {
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: 422 }
+      );
+    }
     console.error("Create zakat calculation error:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },

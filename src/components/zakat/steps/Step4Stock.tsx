@@ -43,7 +43,7 @@ export default function Step4Stock({
 
       <div className="space-y-4">
         <AssetInput label="Business inventory" labelFr="Valeur du stock commercial" labelAr="قيمة المخزون التجاري" icon="package" value={assets.businessInventory} onChange={(v) => onUpdate("businessInventory", v)} suffix={currency} locale={locale} />
-        <AssetInput label="Business receivables" labelFr="Créances commerciales dues" labelAr="ديون تجارية مستحقة لك" icon="clipboard" value={assets.businessReceivables} onChange={(v) => onUpdate("businessReceivables", v)} suffix={currency} locale={locale} />
+        <AssetInput label="Recoverable business receivables" labelFr="Cr\u00e9ances commerciales probablement recouvrables" labelAr="ديون تجارية مرجوة السداد" icon="clipboard" value={assets.businessReceivables} onChange={(v) => onUpdate("businessReceivables", v)} suffix={currency} locale={locale} />
       </div>
 
       <div className="bg-green-pale/30 rounded-xl p-4 flex items-center justify-between">

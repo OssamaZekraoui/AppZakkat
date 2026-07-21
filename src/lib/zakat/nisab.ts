@@ -1,12 +1,14 @@
 import type { Currency, MetalPrices, NisabType } from "./types";
 import { NISAB_WEIGHTS } from "./schools";
+import Decimal from "decimal.js";
+import { ZakatValidationError } from "./validation";
 
 // Fallback prices (updated manually as safety net)
 const FALLBACK_PRICES: MetalPrices = {
   goldPerGram: 85,
   silverPerGram: 1.05,
   currency: "EUR",
-  updatedAt: new Date().toISOString(),
+  updatedAt: "2026-07-18T00:00:00.000Z",
   source: "fallback",
 };
 
@@ -36,10 +38,29 @@ export function calculateNisabValue(
   const pricePerGram =
     nisabType === "gold" ? metalPrices.goldPerGram : metalPrices.silverPerGram;
 
-  // Prices are in EUR, convert to target currency
-  const valueInEur = weight * pricePerGram;
-  const rate = exchangeRates[currency] || 1;
-  return valueInEur * rate;
+  return new Decimal(weight)
+    .mul(convertPriceToCurrency(pricePerGram, metalPrices.currency, currency, exchangeRates))
+    .toNumber();
+}
+
+export function convertPriceToCurrency(
+  value: number,
+  sourceCurrency: Currency,
+  targetCurrency: Currency,
+  exchangeRates: Record<Currency, number>
+): number {
+  if (!Number.isFinite(value) || value < 0) {
+    throw new ZakatValidationError("Price must be a finite non-negative number");
+  }
+  if (sourceCurrency === targetCurrency) return value;
+
+  const sourceRate = exchangeRates[sourceCurrency];
+  const targetRate = exchangeRates[targetCurrency];
+  if (!Number.isFinite(sourceRate) || sourceRate <= 0 || !Number.isFinite(targetRate) || targetRate <= 0) {
+    throw new ZakatValidationError("Exchange rates must be finite positive numbers");
+  }
+
+  return new Decimal(value).div(sourceRate).mul(targetRate).toNumber();
 }
 
 export function getGoldNisabValue(

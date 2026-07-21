@@ -36,8 +36,31 @@ export default function Step3Investments({
       </div>
 
       <div className="space-y-4">
-        <AssetInput label="Halal stocks" labelFr="Actions halal" labelAr="أسهم حلال" icon="chart" value={assets.halalStocks} onChange={(v) => onUpdate("halalStocks", v)} suffix={currency} locale={locale} />
-        <AssetInput label="Islamic funds" labelFr="Fonds islamiques" labelAr="صناديق إسلامية" icon="chart-pie" value={assets.islamicFunds} onChange={(v) => onUpdate("islamicFunds", v)} suffix={currency} locale={locale} />
+        <AssetInput
+          label="Zakatable portion of stocks"
+          labelFr="Part zakatable des actions"
+          labelAr="الجزء الخاضع للزكاة من الأسهم"
+          icon="chart"
+          value={assets.halalStocks}
+          onChange={(v) => onUpdate("halalStocks", v)}
+          suffix={currency}
+          locale={locale}
+          hint={pickText(locale, {
+            ar: "للمتاجرة: القيمة السوقية كاملة. للاستثمار الطويل: صافي الأصول الزكوية للشركات.",
+            fr: "Revente: valeur marchande compl\u00e8te. Long terme: votre part des actifs zakatables des soci\u00e9t\u00e9s.",
+            en: "Trading: full market value. Long term: your share of the companies' zakatable assets.",
+          })}
+        />
+        <AssetInput
+          label="Zakatable portion of Islamic funds"
+          labelFr="Part zakatable des fonds islamiques"
+          labelAr="الجزء الخاضع للزكاة من الصناديق الإسلامية"
+          icon="chart-pie"
+          value={assets.islamicFunds}
+          onChange={(v) => onUpdate("islamicFunds", v)}
+          suffix={currency}
+          locale={locale}
+        />
         <AssetInput label="Dividends" labelFr="Dividendes" labelAr="أرباح متراكمة" icon="circle-dollar" value={assets.dividends} onChange={(v) => onUpdate("dividends", v)} suffix={currency} locale={locale} />
         <AssetInput label="Crypto (halal)" labelFr="Crypto halal" labelAr="عملات رقمية حلال" icon="bitcoin" value={assets.cryptoHalal} onChange={(v) => onUpdate("cryptoHalal", v)} suffix={currency} locale={locale} />
 

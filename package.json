@@ -9,14 +9,18 @@
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate:deploy": "prisma migrate deploy",
+    "db:seed:demo": "node prisma/seed-demo.mjs",
+    "db:clear:demo": "node prisma/clear-demo.mjs",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "vitest run"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "^7.4.2",
     "@stripe/stripe-js": "^9.0.1",
     "bcryptjs": "^3.0.3",
+    "decimal.js": "^10.6.0",
     "dotenv": "^17.3.1",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^1.24.0",
@@ -40,6 +44,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }

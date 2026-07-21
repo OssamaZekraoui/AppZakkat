@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import type {
   Currency,
+  NisabType,
   ZakatSchool,
   ZakatAssets,
   MetalPrices,
@@ -11,7 +12,6 @@ import type {
 import { DEFAULT_ASSETS } from "@/lib/zakat/types";
 import { getDefaultExchangeRates, getFallbackPrices } from "@/lib/zakat/nisab";
 import { calculateZakat } from "@/lib/zakat/calculator";
-import { SCHOOL_RULES } from "@/lib/zakat/schools";
 
 import StepIndicator from "./ui/StepIndicator";
 import Step0Intro from "./steps/Step0Intro";
@@ -31,6 +31,7 @@ interface WizardState {
   currentStep: number;
   assets: ZakatAssets;
   currency: Currency;
+  nisabType: NisabType;
   school: ZakatSchool;
   hawlStart: string;
   metalPrices: MetalPrices | null;
@@ -43,6 +44,7 @@ function getInitialState(): WizardState {
     currentStep: 0,
     assets: { ...DEFAULT_ASSETS },
     currency: "MAD",
+    nisabType: "gold",
     school: "maliki",
     hawlStart: "",
     metalPrices: null,
@@ -64,9 +66,12 @@ export default function ZakatWizard({ locale }: ZakatWizardProps) {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved) as Partial<WizardState>;
+        // Hydrate the client-only draft after the initial server render.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setState((prev) => ({
           ...prev,
           ...parsed,
+          assets: { ...DEFAULT_ASSETS, ...parsed.assets },
           metalPrices: prev.metalPrices, // Don't restore cached prices
           result: null, // Always recalculate
         }));
@@ -106,6 +111,7 @@ export default function ZakatWizard({ locale }: ZakatWizardProps) {
               updatedAt: data.updatedAt,
               source: data.source,
             },
+            exchangeRates: data.exchangeRates ?? prev.exchangeRates,
           }));
         }
       } catch {
@@ -135,7 +141,7 @@ export default function ZakatWizard({ locale }: ZakatWizardProps) {
       const result = calculateZakat({
         assets: state.assets,
         currency: state.currency,
-        nisabType: SCHOOL_RULES[state.school].nisabReference,
+        nisabType: state.nisabType,
         school: state.school,
         hawlStart: state.hawlStart || new Date().toISOString(),
         metalPrices: prices,
@@ -169,6 +175,8 @@ export default function ZakatWizard({ locale }: ZakatWizardProps) {
           <Step0Intro
             currency={state.currency}
             onCurrencyChange={(c) => setState((p) => ({ ...p, currency: c }))}
+            nisabType={state.nisabType}
+            onNisabTypeChange={(nisabType) => setState((p) => ({ ...p, nisabType }))}
             school={state.school}
             onSchoolChange={(s) => setState((p) => ({ ...p, school: s }))}
             metalPrices={state.metalPrices}
@@ -282,8 +290,10 @@ export default function ZakatWizard({ locale }: ZakatWizardProps) {
 
             <button
               onClick={goNext}
+              disabled={state.currentStep === 6 && !state.hawlStart}
               className="px-8 py-3 rounded-xl bg-gold text-green-deep font-cairo font-bold
-                         hover:bg-gold-light shadow-lg hover:shadow-xl transition-all"
+                         hover:bg-gold-light shadow-lg hover:shadow-xl transition-all
+                         disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-gold"
             >
               {state.currentStep === 6
                 ? pickText(locale, {

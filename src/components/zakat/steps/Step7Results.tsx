@@ -19,6 +19,29 @@ const SCHOOL_LABELS: Record<ZakatSchool, { ar: string; fr: string; en: string }>
   hanbalite: { ar: "حنبلي", fr: "Hanbalite", en: "Hanbali" },
 };
 
+const WARNING_TEXT = {
+  fallback_metal_prices: {
+    ar: "تم استعمال أسعار احتياطية للمعادن؛ تحقق من السعر الحالي قبل الأداء.",
+    fr: "Des prix de secours ont été utilisés; vérifiez les cours actuels avant de payer.",
+    en: "Fallback metal prices were used; verify current prices before paying.",
+  },
+  agriculture_not_included: {
+    ar: "لم تُحتسب الزكاة الزراعية لأنها تحتاج حاسبة مستقلة.",
+    fr: "La Zakat agricole n'a pas été incluse car elle nécessite un calcul dédié.",
+    en: "Agricultural Zakat was not included because it requires a dedicated calculation.",
+  },
+  investment_method_review: {
+    ar: "تحقق من أن المبلغ المدخل للأسهم والصناديق هو الجزء الخاضع للزكاة فقط.",
+    fr: "Vérifiez que les montants d'actions et de fonds représentent uniquement leur part zakatable.",
+    en: "Verify that stock and fund amounts contain only their zakatable portion.",
+  },
+  crypto_review: {
+    ar: "حكم العملات الرقمية وتقييمها يحتاجان مراجعة عالم موثوق.",
+    fr: "Le traitement et la valorisation des cryptomonnaies doivent être confirmés par un savant compétent.",
+    en: "Cryptocurrency treatment and valuation should be confirmed with a qualified scholar.",
+  },
+} as const;
+
 export default function Step7Results({
   result,
   onReset,
@@ -46,6 +69,19 @@ export default function Step7Results({
       </div>
 
       <ZakatResultCard result={result} locale={locale} />
+
+      {result.warnings.length > 0 && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+          <div className="flex gap-3">
+            <AppIcon name="alert" className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" />
+            <ul className="space-y-2 font-cairo text-sm text-amber-900">
+              {result.warnings.map((warning) => (
+                <li key={warning}>{pickText(locale, WARNING_TEXT[warning])}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
 
       <div className="bg-white rounded-2xl border border-green-deep/10 overflow-hidden">
         <div className="p-4 bg-green-pale/20 border-b border-green-deep/10">

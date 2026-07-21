@@ -3,6 +3,9 @@
 import type { Currency, ZakatAssets } from "@/lib/zakat/types";
 import AssetInput from "../ui/AssetInput";
 import { numberLocale, pickText } from "../zakatText";
+import { getHawlStatus } from "@/lib/zakat/hawl";
+
+const TODAY_UTC = new Date().toISOString().slice(0, 10);
 
 interface Step6Props {
   assets: ZakatAssets;
@@ -24,32 +27,29 @@ export default function Step6Debts({
   let hawlEndStr = "";
   let daysLeft = 0;
   let hawlCompleted = false;
+  let hawlEnd: Date | null = null;
 
   if (hawlStart) {
-    const start = new Date(hawlStart);
-    const end = new Date(start);
-    end.setDate(end.getDate() + 354);
-    hawlEndStr = end.toLocaleDateString(numberLocale(locale));
-
-    const today = new Date();
-    const diff = Math.floor(
-      (today.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
-    );
-    hawlCompleted = diff >= 354;
-    daysLeft = hawlCompleted ? 0 : 354 - diff;
+    try {
+      const status = getHawlStatus(hawlStart, TODAY_UTC);
+      hawlEnd = status.end;
+      hawlEndStr = status.end.toLocaleDateString(numberLocale(locale), { timeZone: "UTC" });
+      hawlCompleted = status.completed;
+      daysLeft = status.daysUntilCompletion;
+    } catch {
+      hawlEnd = null;
+    }
   }
 
   let hijriDate = "";
-  if (hawlStart) {
+  if (hawlEnd) {
     try {
-      const start = new Date(hawlStart);
-      const end = new Date(start);
-      end.setDate(end.getDate() + 354);
-      hijriDate = end.toLocaleDateString(locale === "ar" ? "ar-SA" : numberLocale(locale), {
+      hijriDate = hawlEnd.toLocaleDateString(locale === "ar" ? "ar-SA" : numberLocale(locale), {
         calendar: "islamic",
         year: "numeric",
         month: "long",
         day: "numeric",
+        timeZone: "UTC",
       } as Intl.DateTimeFormatOptions);
     } catch {
       // Hijri calendar not supported in all browsers
@@ -98,6 +98,8 @@ export default function Step6Debts({
         </label>
         <input
           type="date"
+          required
+          max={TODAY_UTC}
           value={hawlStart}
           onChange={(e) => onHawlStartChange(e.target.value)}
           className="w-full px-4 py-3 rounded-xl border-2 border-green-deep/10 bg-white font-lato

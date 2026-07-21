@@ -94,18 +94,15 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get("category");
     const country = searchParams.get("country");
-    const status = searchParams.get("status");
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
 
     const where: Record<string, unknown> = {};
 
-    // By default show PUBLISHED requests (public listing)
-    if (status) {
-      where.status = status;
-    } else {
-      where.status = "PUBLISHED";
-    }
+    // This is the public catalogue: a request must never be exposed before
+    // an administrator has approved it. Status filtering belongs to the
+    // protected admin endpoint (/api/admin/demandes).
+    where.status = "PUBLISHED";
 
     if (category) {
       where.category = category;

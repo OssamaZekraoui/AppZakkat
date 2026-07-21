@@ -1,23 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { calculateZakat } from "@/lib/zakat/calculator";
-import type { ZakatInput } from "@/lib/zakat/types";
+import { ZakatValidationError } from "@/lib/zakat/validation";
 
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as ZakatInput;
-
-    // Validate required fields
-    if (!body.assets || !body.currency || !body.school || !body.hawlStart || !body.metalPrices) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
-    }
-
+    const body: unknown = await request.json();
     const result = calculateZakat(body);
 
     return NextResponse.json(result);
   } catch (error) {
+    if (error instanceof ZakatValidationError) {
+      return NextResponse.json({ error: error.message }, { status: 422 });
+    }
     console.error("Zakat calculation error:", error);
     return NextResponse.json(
       { error: "Calculation failed" },

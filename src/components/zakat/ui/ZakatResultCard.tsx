@@ -19,30 +19,8 @@ export default function ZakatResultCard({
       maximumFractionDigits: 2,
     });
 
-  if (!result.hawlCompleted && !result.zakatDue) {
-    return (
-      <div className="rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-200 p-8 text-center">
-        <div className="text-5xl mb-4">⏳</div>
-        <h3 className="font-amiri text-2xl text-orange-800 mb-2">
-          {pickText(locale, {
-            ar: "لم يكتمل الحول بعد",
-            fr: "Le Hawl n'est pas encore complété",
-            en: "Hawl is not complete yet",
-          })}
-        </h3>
-        <p className="font-cairo text-orange-600 text-lg">
-          {pickText(locale, {
-            ar: `${result.daysUntilHawl?.toLocaleString("ar-MA")} يوماً متبقياً`,
-            fr: `${result.daysUntilHawl} jours restants`,
-            en: `${result.daysUntilHawl} days remaining`,
-          })}
-        </p>
-      </div>
-    );
-  }
-
   if (!result.nisabMet) {
-    const gap = result.nisabThreshold - result.netZakatableAssets;
+    const gap = Math.max(0, result.nisabThreshold - result.netZakatableAssets);
     return (
       <div className="rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-gray-200 p-8 text-center">
         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-lg bg-gray-200 text-gray-600">
@@ -60,6 +38,28 @@ export default function ZakatResultCard({
           <span className="font-lato font-bold" dir="ltr">
             {fmt(gap)} {result.currency}
           </span>
+        </p>
+      </div>
+    );
+  }
+
+  if (!result.hawlCompleted) {
+    return (
+      <div className="rounded-2xl bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-200 p-8 text-center">
+        <AppIcon name="clock" className="mx-auto mb-4 h-12 w-12 text-orange-700" />
+        <h3 className="font-amiri text-2xl text-orange-800 mb-2">
+          {pickText(locale, {
+            ar: "لم يكتمل الحول بعد",
+            fr: "Le Hawl n'est pas encore complété",
+            en: "Hawl is not complete yet",
+          })}
+        </h3>
+        <p className="font-cairo text-orange-600 text-lg">
+          {pickText(locale, {
+            ar: `${result.daysUntilHawl?.toLocaleString("ar-MA")} يوماً متبقياً`,
+            fr: `${result.daysUntilHawl} jours restants`,
+            en: `${result.daysUntilHawl} days remaining`,
+          })}
         </p>
       </div>
     );

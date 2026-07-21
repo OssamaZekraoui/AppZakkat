@@ -17,8 +17,7 @@ export default function Step5Receivables({
   currency,
   locale,
 }: Step5Props) {
-  const subtotal =
-    assets.loansGiven + assets.rentalIncome + assets.agriculturalOutput;
+  const subtotal = assets.loansGiven + assets.rentalIncome;
 
   const fmt = (n: number) =>
     n.toLocaleString(numberLocale(locale), {
@@ -35,24 +34,17 @@ export default function Step5Receivables({
       </div>
 
       <div className="space-y-4">
-        <AssetInput label="Loans given (Qard Hasan)" labelFr="Prêts accordés (Qard Hassan)" labelAr="قروض حسنة ممنوحة" icon="handshake" value={assets.loansGiven} onChange={(v) => onUpdate("loansGiven", v)} suffix={currency} locale={locale} />
+        <AssetInput label="Recoverable loans given" labelFr="Prêts dont le remboursement est probable" labelAr="قروض مرجوة السداد" icon="handshake" value={assets.loansGiven} onChange={(v) => onUpdate("loansGiven", v)} suffix={currency} locale={locale} />
         <AssetInput label="Rental income" labelFr="Revenus locatifs accumulés" labelAr="إيرادات إيجارية متراكمة" icon="house" value={assets.rentalIncome} onChange={(v) => onUpdate("rentalIncome", v)} suffix={currency} locale={locale} />
-        <AssetInput
-          label="Agricultural output"
-          labelFr="Production agricole"
-          labelAr="إنتاج زراعي"
-          icon="wheat"
-          value={assets.agriculturalOutput}
-          onChange={(v) => onUpdate("agriculturalOutput", v)}
-          suffix={currency}
-          locale={locale}
-          hint={pickText(locale, {
-            ar: "الزكاة الزراعية لا تشترط الحول — 5% مسقي، 10% بعل",
-            fr: "La Zakat agricole ne requiert pas le Hawl — 5% irrigué, 10% naturel",
-            en: "Agricultural Zakat does not require Hawl — 5% irrigated, 10% naturally watered",
-          })}
-        />
       </div>
+
+      <p className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm font-cairo text-amber-800">
+        {pickText(locale, {
+          ar: "زكاة الزروع والثمار لها نصاب وطريقة حساب مستقلان، لذلك لا تدخل في حاسبة زكاة المال هذه.",
+          fr: "La Zakat agricole poss\u00e8de un nisab et des r\u00e8gles d'irrigation propres; elle n'est pas incluse dans ce calcul de patrimoine.",
+          en: "Agricultural Zakat has its own nisab and irrigation rules, so it is not included in this wealth calculation.",
+        })}
+      </p>
 
       <div className="bg-green-pale/30 rounded-xl p-4 flex items-center justify-between">
         <span className="font-cairo font-bold text-green-deep">

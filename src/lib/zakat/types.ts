@@ -1,13 +1,19 @@
 export type Currency = "MAD" | "EUR" | "USD" | "GBP";
 export type NisabType = "gold" | "silver";
 export type ZakatSchool = "hanafi" | "maliki" | "shafiite" | "hanbalite";
+export type MetalPriceSource = "live" | "cached" | "manual" | "fallback";
+export type ZakatWarning =
+  | "fallback_metal_prices"
+  | "agriculture_not_included"
+  | "investment_method_review"
+  | "crypto_review";
 
 export interface MetalPrices {
   goldPerGram: number;
   silverPerGram: number;
-  currency: string;
+  currency: Currency;
   updatedAt: string;
-  source: "live" | "cached" | "fallback";
+  source: MetalPriceSource;
 }
 
 export interface ZakatAssets {
@@ -86,6 +92,7 @@ export interface ZakatResult {
   school: ZakatSchool;
   currency: Currency;
   calculatedAt: string;
+  warnings: ZakatWarning[];
 }
 
 export const DEFAULT_ASSETS: ZakatAssets = {
