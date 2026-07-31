@@ -19,14 +19,15 @@ export default function CurrencySelector({
   onChange,
 }: CurrencySelectorProps) {
   return (
-    <div className="flex gap-2">
+    <div className="grid w-full grid-cols-2 gap-2 sm:grid-cols-4">
       {CURRENCIES.map((c) => {
         const isSelected = value === c.value;
         return (
           <button
+            type="button"
             key={c.value}
             onClick={() => onChange(c.value)}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+            className={`flex min-w-0 items-center justify-center gap-1.5 rounded-xl px-2 py-2 text-sm font-bold transition-all ${
               isSelected
                 ? "bg-gold text-green-deep shadow-md"
                 : "bg-white text-green-deep/60 border border-green-deep/10 hover:border-green-deep/20"
