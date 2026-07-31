@@ -20,6 +20,9 @@ const DEFAULT_EXCHANGE_RATES: Record<Currency, number> = {
   GBP: 0.86,
 };
 
+// Administrative reference value for the silver nisab in Morocco.
+export const SILVER_NISAB_MAD = 7_438;
+
 export function getFallbackPrices(): MetalPrices {
   return { ...FALLBACK_PRICES };
 }
@@ -34,6 +37,10 @@ export function calculateNisabValue(
   currency: Currency,
   exchangeRates: Record<Currency, number>
 ): number {
+  if (nisabType === "silver") {
+    return convertPriceToCurrency(SILVER_NISAB_MAD, "MAD", currency, exchangeRates);
+  }
+
   const weight = NISAB_WEIGHTS[nisabType];
   const pricePerGram =
     nisabType === "gold" ? metalPrices.goldPerGram : metalPrices.silverPerGram;

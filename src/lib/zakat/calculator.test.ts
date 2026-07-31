@@ -54,13 +54,13 @@ describe("calculateZakat", () => {
       input({
         nisabType: "silver",
         school: "maliki",
-        assets: { ...DEFAULT_ASSETS, cash: 595 },
+        assets: { ...DEFAULT_ASSETS, cash: 743.8 },
       }),
       completedHawl
     );
 
-    expect(result.nisabThreshold).toBe(595);
-    expect(result.zakatAmount).toBe(14.88);
+    expect(result.nisabThreshold).toBe(743.8);
+    expect(result.zakatAmount).toBe(18.6);
   });
 
   it.each([
