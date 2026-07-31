@@ -48,13 +48,20 @@ export default function GoogleAuthComplete({ locale }: { locale: string }) {
         const response = await fetch("/api/auth/google/exchange", {
           method: "POST",
         });
-        const result = (await response.json()) as ExchangeResponse;
+        const result = (await response.json().catch(() => ({
+          success: false,
+          error: "invalid_server_response",
+        }))) as ExchangeResponse;
 
         if (response.ok && result.success && result.data) {
           return result.data;
         }
 
         if (response.status !== 401 || attempt === 2) {
+          console.error("Google authentication exchange failed", {
+            status: response.status,
+            error: result.error || "unknown_error",
+          });
           throw new Error(result.error || "Google exchange failed");
         }
 
