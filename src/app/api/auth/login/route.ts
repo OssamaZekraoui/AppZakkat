@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
+import { createSessionToken, setSessionCookie } from "@/lib/session";
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,11 +31,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const token = jwt.sign(
-      { userId: user.id, email: user.email, role: user.role },
-      process.env.JWT_SECRET!,
-      { expiresIn: "7d" }
-    );
+    const token = createSessionToken({
+      userId: user.id,
+      email: user.email,
+      role: user.role,
+    });
 
     const response = NextResponse.json({
       success: true,
@@ -45,12 +45,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    response.cookies.set("auth_token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 7 * 24 * 60 * 60, // 7 days
-      path: "/",
-    });
+    setSessionCookie(response, token);
 
     return response;
   } catch (error) {

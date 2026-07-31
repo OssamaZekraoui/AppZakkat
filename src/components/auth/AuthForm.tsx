@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { signIn } from "next-auth/react";
 import { Link, useRouter } from "@/i18n/navigation";
 
 type AuthMode = "login" | "register";
@@ -54,6 +55,8 @@ const text = {
     invalidCredentials: "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
     userExists: "يوجد حساب بهذا البريد الإلكتروني بالفعل.",
     generic: "حدث خطأ، حاول مرة أخرى.",
+    google: "المتابعة باستخدام Google",
+    or: "أو",
   },
   fr: {
     loginTitle: "Connexion",
@@ -79,6 +82,8 @@ const text = {
     invalidCredentials: "Email ou mot de passe incorrect.",
     userExists: "Un compte existe déjà avec cet email.",
     generic: "Une erreur est survenue, réessayez.",
+    google: "Continuer avec Google",
+    or: "ou",
   },
   en: {
     loginTitle: "Login",
@@ -104,6 +109,8 @@ const text = {
     invalidCredentials: "Incorrect email or password.",
     userExists: "An account already exists with this email.",
     generic: "Something went wrong, please try again.",
+    google: "Continue with Google",
+    or: "or",
   },
 } as const;
 
@@ -140,6 +147,7 @@ export default function AuthForm({ mode, locale }: AuthFormProps) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const title = isRegister ? t.registerTitle : t.loginTitle;
   const subtitle = isRegister ? t.registerSubtitle : t.loginSubtitle;
@@ -207,6 +215,20 @@ export default function AuthForm({ mode, locale }: AuthFormProps) {
     }
   }
 
+  async function handleGoogleSignIn() {
+    setError("");
+    setGoogleLoading(true);
+
+    try {
+      await signIn("google", {
+        callbackUrl: `${window.location.origin}/${currentLocale}/auth/google`,
+      });
+    } catch {
+      setError(t.generic);
+      setGoogleLoading(false);
+    }
+  }
+
   return (
     <main
       className="min-h-screen bg-white-off pt-24 pb-14"
@@ -236,6 +258,33 @@ export default function AuthForm({ mode, locale }: AuthFormProps) {
                 <p className="mt-3 font-cairo text-base leading-7 text-green-deep/62">
                   {subtitle}
                 </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={googleLoading || loading}
+                className="flex min-h-14 w-full cursor-pointer items-center justify-center gap-3 rounded-2xl border-2 border-green-deep/12 bg-white px-5 py-3 font-cairo text-base font-black text-green-deep transition-colors duration-200 hover:border-gold/55 hover:bg-green-pale/25 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-gold/20 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  className="h-5 w-5 shrink-0"
+                >
+                  <path fill="#4285F4" d="M21.6 12.23c0-.71-.06-1.4-.18-2.06H12v3.9h5.38a4.6 4.6 0 0 1-2 3.02v2.53h3.24c1.9-1.75 2.98-4.33 2.98-7.39Z" />
+                  <path fill="#34A853" d="M12 22c2.7 0 4.98-.9 6.64-2.43l-3.24-2.53c-.9.6-2.05.96-3.4.96-2.61 0-4.82-1.76-5.61-4.13H3.04v2.61A10 10 0 0 0 12 22Z" />
+                  <path fill="#FBBC05" d="M6.39 13.87A6 6 0 0 1 6.08 12c0-.65.11-1.28.31-1.87V7.52H3.04A10 10 0 0 0 2 12c0 1.61.39 3.14 1.04 4.48l3.35-2.61Z" />
+                  <path fill="#EA4335" d="M12 6c1.47 0 2.79.51 3.83 1.5l2.88-2.88A9.66 9.66 0 0 0 12 2a10 10 0 0 0-8.96 5.52l3.35 2.61C7.18 7.76 9.39 6 12 6Z" />
+                </svg>
+                <span>{googleLoading ? loadingText : t.google}</span>
+              </button>
+
+              <div className="my-6 flex items-center gap-4" aria-hidden="true">
+                <span className="h-px flex-1 bg-green-deep/12" />
+                <span className="font-cairo text-xs font-bold uppercase text-green-deep/45">
+                  {t.or}
+                </span>
+                <span className="h-px flex-1 bg-green-deep/12" />
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-5">

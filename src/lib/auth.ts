@@ -1,35 +1,12 @@
 import { NextRequest } from "next/server";
-import jwt from "jsonwebtoken";
+import { AUTH_COOKIE_NAME, verifySessionToken } from "@/lib/session";
 
-type AuthTokenPayload = {
-  userId: string;
-  email: string;
-};
-
-export function getAuthUser(request: NextRequest): AuthTokenPayload | null {
+export function getAuthUser(request: NextRequest) {
   const authorization = request.headers.get("authorization");
-  const token = authorization?.startsWith("Bearer ")
+  const bearerToken = authorization?.startsWith("Bearer ")
     ? authorization.slice("Bearer ".length)
     : null;
+  const token = bearerToken || request.cookies.get(AUTH_COOKIE_NAME)?.value;
 
-  if (!token || !process.env.JWT_SECRET) {
-    return null;
-  }
-
-  try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
-
-    if (
-      typeof payload === "object" &&
-      payload !== null &&
-      typeof payload.userId === "string" &&
-      typeof payload.email === "string"
-    ) {
-      return { userId: payload.userId, email: payload.email };
-    }
-  } catch {
-    return null;
-  }
-
-  return null;
+  return token ? verifySessionToken(token) : null;
 }
