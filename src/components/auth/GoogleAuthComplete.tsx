@@ -58,10 +58,11 @@ export default function GoogleAuthComplete({ locale }: { locale: string }) {
         }
 
         if (response.status !== 401 || attempt === 2) {
-          console.error("Google authentication exchange failed", {
-            status: response.status,
-            error: result.error || "unknown_error",
-          });
+          console.error(
+            `Google authentication exchange failed: ${response.status} ${
+              result.error || "unknown_error"
+            }`
+          );
           throw new Error(result.error || "Google exchange failed");
         }
 
