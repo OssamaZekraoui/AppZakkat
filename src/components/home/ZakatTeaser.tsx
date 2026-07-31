@@ -2,13 +2,14 @@
 
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AppIcon from "@/components/ui/AppIcon";
 
 const GOLD_PRICE_DEFAULT = 850; // MAD per gram (approximate)
 const SILVER_PRICE_DEFAULT = 10; // MAD per gram (approximate)
 const ZAKAT_RATE = 0.025;
 const GOLD_NISAB_GRAMS = 85;
+const SILVER_NISAB_MAD = 7438;
 
 export default function ZakatTeaser() {
   const t = useTranslations("zakatTeaser");
@@ -16,13 +17,29 @@ export default function ZakatTeaser() {
   const [gold, setGold] = useState("");
   const [silver, setSilver] = useState("");
   const [result, setResult] = useState<number | null>(null);
+  const [goldPrice, setGoldPrice] = useState(GOLD_PRICE_DEFAULT);
+  const [silverPrice, setSilverPrice] = useState(SILVER_PRICE_DEFAULT);
+  const [nisabType, setNisabType] = useState<"gold" | "silver">("gold");
+
+  useEffect(() => {
+    fetch("/api/metals-price")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (!data) return;
+        const madRate = Number(data.exchangeRates?.MAD) || 10.8;
+        setGoldPrice(Number(data.goldPerGram) * madRate);
+        setSilverPrice(Number(data.silverPerGram) * madRate);
+        setNisabType(data.nisabType === "silver" ? "silver" : "gold");
+      })
+      .catch(() => undefined);
+  }, []);
 
   const handleCalculate = () => {
     const cashVal = parseFloat(cash) || 0;
-    const goldVal = (parseFloat(gold) || 0) * GOLD_PRICE_DEFAULT;
-    const silverVal = (parseFloat(silver) || 0) * SILVER_PRICE_DEFAULT;
+    const goldVal = (parseFloat(gold) || 0) * goldPrice;
+    const silverVal = (parseFloat(silver) || 0) * silverPrice;
     const total = cashVal + goldVal + silverVal;
-    const nisab = GOLD_NISAB_GRAMS * GOLD_PRICE_DEFAULT;
+    const nisab = nisabType === "silver" ? SILVER_NISAB_MAD : GOLD_NISAB_GRAMS * goldPrice;
 
     if (total >= nisab) {
       setResult(total * ZAKAT_RATE);
@@ -74,6 +91,9 @@ export default function ZakatTeaser() {
             <h3 className="text-gold font-cairo font-bold text-xl mb-6 text-center">
               {t("quickCalcTitle")}
             </h3>
+            <p className="-mt-4 mb-6 text-center font-cairo text-sm font-semibold text-white/70">
+              {t("quickCalcCurrency")}
+            </p>
 
             <div className="space-y-4">
               <div>
