@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { calculateZakat } from "@/lib/zakat/calculator";
-import { ZakatValidationError } from "@/lib/zakat/validation";
+import { parseZakatInput, ZakatValidationError } from "@/lib/zakat/validation";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   try {
     const body: unknown = await request.json();
-    const result = calculateZakat(body);
+    const input = parseZakatInput(body);
+    const settings = await prisma.siteSettings.findUnique({ where: { id: "global" } });
+    input.nisabType = settings?.nisabType === "SILVER" ? "silver" : "gold";
+    const result = calculateZakat(input);
 
     return NextResponse.json(result);
   } catch (error) {

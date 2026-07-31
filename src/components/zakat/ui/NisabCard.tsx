@@ -10,7 +10,6 @@ interface NisabCardProps {
   currency: Currency;
   exchangeRates: Record<Currency, number>;
   selectedType: NisabType;
-  onTypeChange: (type: NisabType) => void;
   locale: string;
 }
 
@@ -19,7 +18,6 @@ export default function NisabCard({
   currency,
   exchangeRates,
   selectedType,
-  onTypeChange,
   locale,
 }: NisabCardProps) {
   if (!metalPrices) {
@@ -84,12 +82,10 @@ export default function NisabCard({
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <button
-          type="button"
-          onClick={() => onTypeChange("gold")}
-          aria-pressed={selectedType === "gold"}
+        <div
+          aria-current={selectedType === "gold" ? "true" : undefined}
           className={`bg-white rounded-xl p-3 border-2 text-start transition-colors ${
-            selectedType === "gold" ? "border-gold" : "border-gold/20"
+            selectedType === "gold" ? "border-gold" : "border-gold/20 opacity-55"
           }`}
         >
           <div className="flex items-center gap-1.5 mb-1">
@@ -104,14 +100,12 @@ export default function NisabCard({
           <p className="text-[10px] text-green-deep/40 font-lato mt-0.5" dir="ltr">
             {formatPrice(goldPrice)} {currency}/g
           </p>
-        </button>
+        </div>
 
-        <button
-          type="button"
-          onClick={() => onTypeChange("silver")}
-          aria-pressed={selectedType === "silver"}
+        <div
+          aria-current={selectedType === "silver" ? "true" : undefined}
           className={`bg-white rounded-xl p-3 border-2 text-start transition-colors ${
-            selectedType === "silver" ? "border-gold" : "border-green-deep/10"
+            selectedType === "silver" ? "border-gold" : "border-green-deep/10 opacity-55"
           }`}
         >
           <div className="flex items-center gap-1.5 mb-1">
@@ -126,13 +120,13 @@ export default function NisabCard({
           <p className="text-[10px] text-green-deep/40 font-lato mt-0.5" dir="ltr">
             {formatPrice(silverPrice)} {currency}/g
           </p>
-        </button>
+        </div>
       </div>
       <p className="mt-3 text-xs font-cairo text-green-deep/55">
         {pickText(locale, {
           ar: "اختر معيار النصاب الذي تتبعه؛ الاختيار مستقل عن المذهب.",
-          fr: "Choisissez le r\u00e9f\u00e9rentiel du nisab que vous suivez; ce choix est distinct de l'\u00e9cole juridique.",
-          en: "Choose the nisab reference you follow; this choice is separate from the legal school.",
+          fr: "Le référentiel du nissab est défini par l’administration de la plateforme.",
+          en: "The nisab reference is set by the platform administrator.",
         })}
       </p>
     </div>

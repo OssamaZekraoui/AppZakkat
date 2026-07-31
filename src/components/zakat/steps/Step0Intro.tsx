@@ -10,7 +10,6 @@ interface Step0Props {
   currency: Currency;
   onCurrencyChange: (c: Currency) => void;
   nisabType: NisabType;
-  onNisabTypeChange: (type: NisabType) => void;
   school: ZakatSchool;
   onSchoolChange: (s: ZakatSchool) => void;
   metalPrices: MetalPrices | null;
@@ -22,7 +21,6 @@ export default function Step0Intro({
   currency,
   onCurrencyChange,
   nisabType,
-  onNisabTypeChange,
   school,
   onSchoolChange,
   metalPrices,
@@ -66,7 +64,6 @@ export default function Step0Intro({
         currency={currency}
         exchangeRates={exchangeRates}
         selectedType={nisabType}
-        onTypeChange={onNisabTypeChange}
         locale={locale}
       />
 

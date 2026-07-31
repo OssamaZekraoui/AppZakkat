@@ -2,6 +2,7 @@ import { getLocale } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { adminText, getAdminLocale } from "@/lib/adminText";
 import AppIcon, { type AppIconName } from "@/components/ui/AppIcon";
+import NisabSettings from "@/components/admin/NisabSettings";
 
 function StatCard({
   label,
@@ -37,11 +38,16 @@ export default async function AdminDashboardPage() {
   const locale = getAdminLocale(await getLocale());
   const t = adminText[locale];
 
-  const [totalRequests, pendingReviews, totalUsers, publishedRequests] = await Promise.all([
+  const [totalRequests, pendingReviews, totalUsers, publishedRequests, settings] = await Promise.all([
     prisma.request.count(),
     prisma.request.count({ where: { status: "SUBMITTED" } }),
     prisma.user.count(),
     prisma.request.count({ where: { status: "PUBLISHED" } }),
+    prisma.siteSettings.upsert({
+      where: { id: "global" },
+      update: {},
+      create: { id: "global", nisabType: "GOLD" },
+    }),
   ]);
 
   return (
@@ -60,6 +66,11 @@ export default async function AdminDashboardPage() {
         <StatCard label={t.pendingReviews} value={pendingReviews} tone="gold" icon="clock" />
         <StatCard label={locale === "ar" ? "منشورة" : locale === "fr" ? "Publiées" : "Published"} value={publishedRequests} tone="green" icon="success" />
       </section>
+
+      <NisabSettings
+        initialValue={settings.nisabType === "SILVER" ? "silver" : "gold"}
+        locale={locale}
+      />
     </div>
   );
 }

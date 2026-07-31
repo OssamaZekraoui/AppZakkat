@@ -113,6 +113,7 @@ export default function ZakatWizard({ locale }: ZakatWizardProps) {
               source: data.source,
             },
             exchangeRates: data.exchangeRates ?? prev.exchangeRates,
+            nisabType: data.nisabType === "silver" ? "silver" : "gold",
           }));
         }
       } catch {
@@ -197,7 +198,6 @@ export default function ZakatWizard({ locale }: ZakatWizardProps) {
             currency={state.currency}
             onCurrencyChange={(c) => setState((p) => ({ ...p, currency: c }))}
             nisabType={state.nisabType}
-            onNisabTypeChange={(nisabType) => setState((p) => ({ ...p, nisabType }))}
             school={state.school}
             onSchoolChange={(s) => setState((p) => ({ ...p, school: s }))}
             metalPrices={state.metalPrices}

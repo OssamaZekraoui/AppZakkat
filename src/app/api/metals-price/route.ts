@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { Currency } from "@/lib/zakat/types";
 import { getDefaultExchangeRates } from "@/lib/zakat/nisab";
+import { prisma } from "@/lib/prisma";
 
 // Fallback prices (safety net)
 const FALLBACK_GOLD_EUR = 85;
@@ -79,6 +80,8 @@ async function fetchExchangeRates(): Promise<Record<Currency, number> | null> {
 
 export async function GET() {
   const now = Date.now();
+  const settings = await prisma.siteSettings.findUnique({ where: { id: "global" } });
+  const nisabType = settings?.nisabType === "SILVER" ? "silver" : "gold";
 
   // Check in-memory cache
   if (cachedPrices && cachedPrices.expiresAt > now) {
@@ -90,6 +93,7 @@ export async function GET() {
       source: "cached" as const,
       exchangeRates: cachedPrices.exchangeRates,
       nextUpdateIn: Math.floor((cachedPrices.expiresAt - now) / 1000),
+      nisabType,
     });
   }
 
@@ -117,6 +121,7 @@ export async function GET() {
       source: "live" as const,
       exchangeRates,
       nextUpdateIn: CACHE_TTL / 1000,
+      nisabType,
     });
   }
 
@@ -129,5 +134,6 @@ export async function GET() {
     source: "fallback" as const,
     exchangeRates,
     nextUpdateIn: 0,
+    nisabType,
   });
 }

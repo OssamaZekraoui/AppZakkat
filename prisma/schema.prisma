@@ -162,3 +162,11 @@ model ZakatItem {
 
   @@map("zakat_items")
 }
+
+model SiteSettings {
+  id        String    @id @default("global")
+  nisabType NisabType @default(GOLD)
+  updatedAt DateTime  @updatedAt
+
+  @@map("site_settings")
+}

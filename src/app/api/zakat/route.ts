@@ -48,6 +48,8 @@ export async function POST(request: NextRequest) {
   try {
     const body: unknown = await request.json();
     const input = parseZakatInput(body);
+    const settings = await prisma.siteSettings.findUnique({ where: { id: "global" } });
+    input.nisabType = settings?.nisabType === "SILVER" ? "silver" : "gold";
     const result = calculateZakat(input);
 
     const record = await prisma.zakatCalculation.create({
