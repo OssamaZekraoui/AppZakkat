@@ -31,7 +31,7 @@ export default function Chatbot() {
     try {
       let response: Response | null = null;
       for (let attempt = 0; attempt < 2; attempt += 1) {
-        response = await fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ locale, messages: next }) });
+        response = await fetch("/api/assistant", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ locale, messages: next }) });
         if (response.ok || response.status < 500) break;
         await new Promise((resolve) => window.setTimeout(resolve, 800));
       }
