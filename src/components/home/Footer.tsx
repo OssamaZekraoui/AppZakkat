@@ -35,10 +35,12 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="mailto:ossama.zekaroui@gmail.com"
-                  className="break-all text-white/60 hover:text-white font-cairo text-sm transition-colors"
+                  href="https://mail.google.com/mail/?view=cm&fs=1&to=ossama.zekaroui@gmail.com"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-white/60 hover:text-white font-cairo text-sm transition-colors"
                 >
-                  {t("technicalSupport")}: <span dir="ltr">ossama.zekaroui@gmail.com</span>
+                  {t("technicalSupport")}
                 </a>
               </li>
             </ul>
