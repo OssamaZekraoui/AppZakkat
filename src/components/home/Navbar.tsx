@@ -1,12 +1,21 @@
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
-import { Link, usePathname } from "@/i18n/navigation";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { useEffect, useState } from "react";
 import AppIcon from "@/components/ui/AppIcon";
 
 const AUTH_TOKEN_KEY = "diyae-auth-token";
 const AUTH_USER_KEY = "diyae-auth-user";
+const AUTH_NOTICE_KEY = "diyae-auth-notice";
+
+type AuthNotice = "login" | "logout" | null;
+
+const noticeCopy = {
+  ar: { login: "تم تسجيل الدخول بنجاح", logout: "تم تسجيل الخروج بنجاح" },
+  fr: { login: "Connexion réussie", logout: "Déconnexion réussie" },
+  en: { login: "Signed in successfully", logout: "Signed out successfully" },
+} as const;
 
 const localeLabels: Record<string, string> = {
   ar: "ع",
@@ -18,18 +27,34 @@ export default function Navbar() {
   const t = useTranslations("nav");
   const locale = useLocale();
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [notice, setNotice] = useState<AuthNotice>(null);
 
   useEffect(() => {
     setIsAuthenticated(Boolean(localStorage.getItem(AUTH_TOKEN_KEY)));
+    const pendingNotice = sessionStorage.getItem(AUTH_NOTICE_KEY);
+    if (pendingNotice === "login" || pendingNotice === "logout") {
+      setNotice(pendingNotice);
+      sessionStorage.removeItem(AUTH_NOTICE_KEY);
+    }
   }, []);
 
-  function handleLogout() {
+  useEffect(() => {
+    if (!notice) return;
+    const timer = window.setTimeout(() => setNotice(null), 4000);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
+
+  async function handleLogout() {
+    await fetch("/api/auth/logout", { method: "POST" }).catch(() => undefined);
     localStorage.removeItem(AUTH_TOKEN_KEY);
     localStorage.removeItem(AUTH_USER_KEY);
     setIsAuthenticated(false);
     setMobileOpen(false);
+    setNotice("logout");
+    router.replace("/");
   }
 
   const navLinks = [
@@ -39,6 +64,7 @@ export default function Navbar() {
   ];
 
   return (
+    <>
     <nav className="fixed top-0 left-0 right-0 z-50 bg-green-deep/95 backdrop-blur-sm border-b border-gold/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
@@ -204,5 +230,23 @@ export default function Navbar() {
         </div>
       )}
     </nav>
+    {notice && (
+      <div
+        role="status"
+        aria-live="polite"
+        className="fixed bottom-5 left-1/2 z-[70] flex min-h-12 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 items-center gap-3 rounded-2xl border border-emerald-200 bg-white px-4 py-3 text-green-deep shadow-2xl motion-safe:animate-[fadeIn_.2s_ease-out] sm:bottom-auto sm:left-auto sm:right-5 sm:top-20 sm:w-auto sm:translate-x-0"
+      >
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+          <AppIcon name={notice === "login" ? "success" : "logout"} className="h-5 w-5" />
+        </span>
+        <p className="font-cairo text-sm font-black">
+          {noticeCopy[locale as keyof typeof noticeCopy]?.[notice] || noticeCopy.fr[notice]}
+        </p>
+        <button type="button" onClick={() => setNotice(null)} aria-label="Fermer" className="ms-auto flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-green-deep/55 transition-colors hover:bg-green-pale hover:text-green-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold">
+          <AppIcon name="close" className="h-4 w-4" />
+        </button>
+      </div>
+    )}
+    </>
   );
 }

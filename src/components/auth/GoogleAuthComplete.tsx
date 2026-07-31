@@ -5,6 +5,7 @@ import { useRouter } from "@/i18n/navigation";
 
 const AUTH_TOKEN_KEY = "diyae-auth-token";
 const AUTH_USER_KEY = "diyae-auth-user";
+const AUTH_NOTICE_KEY = "diyae-auth-notice";
 
 const messages = {
   ar: {
@@ -78,6 +79,7 @@ export default function GoogleAuthComplete({ locale }: { locale: string }) {
 
         localStorage.setItem(AUTH_TOKEN_KEY, data.token);
         localStorage.setItem(AUTH_USER_KEY, JSON.stringify(data.user));
+        sessionStorage.setItem(AUTH_NOTICE_KEY, "login");
         router.replace(data.user.role === "ADMIN" ? "/admin" : "/");
       } catch {
         if (active) setFailed(true);

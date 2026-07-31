@@ -41,6 +41,12 @@ type Activity = {
   body: string;
 };
 
+type AccountUser = {
+  id: string;
+  email: string;
+  name: string | null;
+};
+
 const copy = {
   fr: {
     eyebrow: "Votre espace personnel",
@@ -50,6 +56,10 @@ const copy = {
     notifications: "Notifications",
     newRequest: "Nouvelle demande",
     calculate: "Calculer ma Zakat",
+    profile: "Informations personnelles",
+    firstName: "Prénom",
+    lastName: "Nom",
+    email: "Adresse e-mail",
     noRequests: "Vous n’avez pas encore envoyé de demande.",
     noNotifications: "Aucune notification pour le moment.",
     submitted: "Demande envoyée",
@@ -69,6 +79,7 @@ const copy = {
   en: {
     eyebrow: "Your personal space", title: "My requests and notifications", subtitle: "Track your aid requests, Zakat calculations and admin decisions.",
     requests: "My requests", notifications: "Notifications", newRequest: "New request", calculate: "Calculate Zakat",
+    profile: "Personal information", firstName: "First name", lastName: "Last name", email: "Email address",
     noRequests: "You have not submitted a request yet.", noNotifications: "No notifications yet.", submitted: "Request submitted",
     approved: "Request approved", rejected: "Request rejected", review: "Under review", draft: "Draft", published: "Published", closed: "Closed",
     calculation: "Zakat calculation saved", calculationBody: (amount: string) => `Your calculation shows Zakat of ${amount}.`,
@@ -79,6 +90,7 @@ const copy = {
   ar: {
     eyebrow: "فضاؤك الشخصي", title: "طلباتي وإشعاراتي", subtitle: "تابع طلبات المساعدة وحسابات الزكاة وقرارات الإدارة.",
     requests: "طلباتي", notifications: "الإشعارات", newRequest: "طلب جديد", calculate: "حساب الزكاة",
+    profile: "المعلومات الشخصية", firstName: "الاسم الأول", lastName: "اسم العائلة", email: "البريد الإلكتروني",
     noRequests: "لم ترسل أي طلب بعد.", noNotifications: "لا توجد إشعارات حالياً.", submitted: "تم إرسال الطلب",
     approved: "تم قبول الطلب", rejected: "تم رفض الطلب", review: "قيد المراجعة", draft: "مسودة", published: "منشور", closed: "مغلق",
     calculation: "تم حفظ حساب الزكاة", calculationBody: (amount: string) => `قيمة الزكاة المحسوبة هي ${amount}.`,
@@ -104,24 +116,36 @@ export default function UserSpace({ locale }: { locale: string }) {
   const [tab, setTab] = useState<Tab>("requests");
   const [requests, setRequests] = useState<UserRequest[]>([]);
   const [calculations, setCalculations] = useState<Calculation[]>([]);
+  const [user, setUser] = useState<AccountUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem(AUTH_TOKEN_KEY);
-    if (!token) return;
-    fetch("/api/me/activity", { headers: { Authorization: `Bearer ${token}` } })
-      .then(async (response) => {
+    const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+    Promise.all([
+      fetch("/api/auth/session").then(async (response) => {
+        if (!response.ok) throw new Error("session");
+        return response.json();
+      }),
+      fetch("/api/me/activity", { headers }).then(async (response) => {
         if (!response.ok) throw new Error("activity");
         return response.json();
-      })
-      .then((data) => {
-        setRequests(data.requests || []);
-        setCalculations(data.calculations || []);
+      }),
+    ])
+      .then(([sessionData, activityData]) => {
+        if (!sessionData.authenticated || !sessionData.user) throw new Error("session");
+        setUser(sessionData.user);
+        setRequests(activityData.requests || []);
+        setCalculations(activityData.calculations || []);
       })
       .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, []);
+
+  const nameParts = (user?.name || "").trim().split(/\s+/).filter(Boolean);
+  const firstName = nameParts[0] || "—";
+  const lastName = nameParts.slice(1).join(" ") || "—";
 
   const activities = useMemo<Activity[]>(() => {
     const items: Activity[] = [];
@@ -162,6 +186,27 @@ export default function UserSpace({ locale }: { locale: string }) {
               <Link href="/zakat" className="rounded-full border border-white/25 bg-white/10 px-5 py-3 font-cairo text-sm font-black text-white transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold">{t.calculate}</Link>
             </div>
           </div>
+        </section>
+
+        <section className="mt-6 rounded-3xl border border-green-deep/10 bg-white p-5 shadow-sm md:p-6" aria-labelledby="profile-title">
+          <div className="flex items-center gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-green-pale text-green-deep">
+              <AppIcon name="users" className="h-5 w-5" />
+            </span>
+            <h2 id="profile-title" className="font-amiri text-2xl font-bold text-green-deep">{t.profile}</h2>
+          </div>
+          <dl className="mt-5 grid gap-3 sm:grid-cols-3">
+            {[
+              [t.firstName, loading ? "…" : firstName],
+              [t.lastName, loading ? "…" : lastName],
+              [t.email, loading ? "…" : user?.email || "—"],
+            ].map(([label, value]) => (
+              <div key={label} className="min-w-0 rounded-2xl border border-green-deep/10 bg-green-pale/25 px-4 py-3">
+                <dt className="font-cairo text-xs font-bold text-green-deep/60">{label}</dt>
+                <dd className="mt-1 truncate font-cairo text-sm font-black text-green-deep" title={value}>{value}</dd>
+              </div>
+            ))}
+          </dl>
         </section>
 
         <div className="mt-6 flex rounded-2xl border border-green-deep/10 bg-white p-1.5 shadow-sm" role="tablist" aria-label={t.title}>
