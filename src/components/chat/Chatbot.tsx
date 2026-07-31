@@ -29,9 +29,14 @@ export default function Chatbot() {
     const next = [...messages, { role: "user" as const, content }];
     setMessages(next); setInput(""); setLoading(true);
     try {
-      const response = await fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ locale, messages: next }) });
+      let response: Response | null = null;
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        response = await fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ locale, messages: next }) });
+        if (response.ok || response.status < 500) break;
+        await new Promise((resolve) => window.setTimeout(resolve, 800));
+      }
+      if (!response?.ok) throw new Error();
       const data = await response.json();
-      if (!response.ok) throw new Error();
       setMessages((current) => [...current, { role: "assistant", content: data.answer }]);
     } catch {
       setMessages((current) => [...current, { role: "assistant", content: t.error }]);
