@@ -11,9 +11,9 @@ export type SessionPayload = {
 };
 
 function getJwtSecret() {
-  const secret = process.env.JWT_SECRET;
+  const secret = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET;
   if (!secret) {
-    throw new Error("JWT_SECRET is not configured");
+    throw new Error("JWT_SECRET or NEXTAUTH_SECRET is not configured");
   }
   return secret;
 }
