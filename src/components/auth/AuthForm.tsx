@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import { signIn } from "next-auth/react";
 import { Link, useRouter } from "@/i18n/navigation";
+import AppIcon from "@/components/ui/AppIcon";
 
 type AuthMode = "login" | "register";
 type AuthLocale = "ar" | "fr" | "en";
@@ -14,6 +15,8 @@ type AuthFormProps = {
 
 type AuthResponse = {
   success: boolean;
+  requiresVerification?: boolean;
+  email?: string;
   error?: string;
   message?: string;
   data?: {
@@ -58,6 +61,16 @@ const text = {
     generic: "حدث خطأ، حاول مرة أخرى.",
     google: "المتابعة باستخدام Google",
     or: "أو",
+    otpTitle: "تفعيل الحساب",
+    otpSubtitle: "أرسلنا رمزاً من 6 أرقام إلى بريدك الإلكتروني",
+    otpLabel: "رمز التفعيل",
+    otpButton: "تفعيل الحساب",
+    otpLoading: "جارٍ التحقق...",
+    resend: "إعادة إرسال الرمز",
+    resendSent: "تم إرسال رمز جديد.",
+    invalidOtp: "الرمز غير صحيح أو انتهت صلاحيته.",
+    emailUnavailable: "تعذر إرسال البريد الإلكتروني. حاول مرة أخرى.",
+    changeEmail: "تغيير البريد الإلكتروني",
   },
   fr: {
     loginTitle: "Connexion",
@@ -85,6 +98,16 @@ const text = {
     generic: "Une erreur est survenue, réessayez.",
     google: "Continuer avec Google",
     or: "ou",
+    otpTitle: "Activer votre compte",
+    otpSubtitle: "Nous avons envoyé un code à 6 chiffres à votre adresse e-mail",
+    otpLabel: "Code d’activation",
+    otpButton: "Activer le compte",
+    otpLoading: "Vérification...",
+    resend: "Renvoyer le code",
+    resendSent: "Un nouveau code a été envoyé.",
+    invalidOtp: "Le code est incorrect ou a expiré.",
+    emailUnavailable: "L’e-mail n’a pas pu être envoyé. Réessayez.",
+    changeEmail: "Modifier l’adresse e-mail",
   },
   en: {
     loginTitle: "Login",
@@ -112,6 +135,16 @@ const text = {
     generic: "Something went wrong, please try again.",
     google: "Continue with Google",
     or: "or",
+    otpTitle: "Activate your account",
+    otpSubtitle: "We sent a 6-digit code to your email address",
+    otpLabel: "Activation code",
+    otpButton: "Activate account",
+    otpLoading: "Verifying...",
+    resend: "Resend code",
+    resendSent: "A new code was sent.",
+    invalidOtp: "The code is incorrect or has expired.",
+    emailUnavailable: "The email could not be sent. Please try again.",
+    changeEmail: "Change email address",
   },
 } as const;
 
@@ -122,6 +155,8 @@ function getLocale(locale: string): AuthLocale {
 function authError(message: string | undefined, locale: AuthLocale) {
   if (message === "Invalid credentials") return text[locale].invalidCredentials;
   if (message === "User already exists") return text[locale].userExists;
+  if (message === "Invalid or expired code" || message === "Too many attempts") return text[locale].invalidOtp;
+  if (message === "Email delivery unavailable") return text[locale].emailUnavailable;
   return text[locale].generic;
 }
 
@@ -146,12 +181,15 @@ export default function AuthForm({ mode, locale }: AuthFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [resendMessage, setResendMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  const title = isRegister ? t.registerTitle : t.loginTitle;
-  const subtitle = isRegister ? t.registerSubtitle : t.loginSubtitle;
+  const title = otpSent ? t.otpTitle : isRegister ? t.registerTitle : t.loginTitle;
+  const subtitle = otpSent ? `${t.otpSubtitle}: ${email}` : isRegister ? t.registerSubtitle : t.loginSubtitle;
   const submitText = isRegister ? t.registerButton : t.loginButton;
   const loadingText = isRegister ? t.loadingRegister : t.loadingLogin;
 
@@ -200,6 +238,10 @@ export default function AuthForm({ mode, locale }: AuthFormProps) {
           setError(authError(registerResult.error, currentLocale));
           return;
         }
+        if (registerResult.requiresVerification) {
+          setOtpSent(true);
+          return;
+        }
       }
 
       const loginResult = await login(email, password);
@@ -210,6 +252,54 @@ export default function AuthForm({ mode, locale }: AuthFormProps) {
       }
 
       await storeSession(loginResult);
+    } catch {
+      setError(t.generic);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleOtpSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    setResendMessage("");
+    if (!/^\d{6}$/.test(otp)) {
+      setError(t.invalidOtp);
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await fetch("/api/auth/register/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ otp }),
+      });
+      const result: AuthResponse = await response.json();
+      if (!response.ok || !result.success) {
+        setError(authError(result.error, currentLocale));
+        return;
+      }
+      await storeSession(result);
+    } catch {
+      setError(t.generic);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleResendOtp() {
+    setError("");
+    setResendMessage("");
+    setLoading(true);
+    try {
+      const response = await fetch("/api/auth/register/resend", { method: "POST" });
+      const result: AuthResponse = await response.json();
+      if (!response.ok || !result.success) {
+        setError(authError(result.error, currentLocale));
+        return;
+      }
+      setOtp("");
+      setResendMessage(t.resendSent);
     } catch {
       setError(t.generic);
     } finally {
@@ -262,6 +352,40 @@ export default function AuthForm({ mode, locale }: AuthFormProps) {
                 </p>
               </div>
 
+              {otpSent && (
+                <form onSubmit={handleOtpSubmit} className="space-y-5">
+                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-pale text-green-deep">
+                    <AppIcon name="mail" className="h-8 w-8" />
+                  </div>
+                  <label className="block">
+                    <span className="mb-2 block text-center font-cairo text-sm font-bold text-green-deep">
+                      {t.otpLabel}
+                    </span>
+                    <input
+                      value={otp}
+                      onChange={(event) => setOtp(event.target.value.replace(/\D/g, "").slice(0, 6))}
+                      className="w-full rounded-2xl border-2 border-green-deep/12 bg-white px-5 py-4 text-center font-lato text-3xl font-black tracking-[0.35em] text-green-deep outline-none transition focus:border-gold focus:ring-4 focus:ring-gold/15"
+                      dir="ltr"
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      maxLength={6}
+                      autoFocus
+                    />
+                  </label>
+                  {error && <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 font-cairo text-sm font-bold text-red-700">{error}</div>}
+                  {resendMessage && <div role="status" className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 font-cairo text-sm font-bold text-emerald-800">{resendMessage}</div>}
+                  <button type="submit" disabled={loading || otp.length !== 6} className="w-full cursor-pointer rounded-2xl bg-gold px-6 py-4 font-cairo text-lg font-black text-green-deep shadow-lg shadow-gold/25 transition-colors duration-200 hover:bg-gold-light focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-gold/25 disabled:cursor-not-allowed disabled:opacity-60">
+                    {loading ? t.otpLoading : t.otpButton}
+                  </button>
+                  <div className="flex flex-col items-center gap-2 font-cairo text-sm">
+                    <button type="button" disabled={loading} onClick={handleResendOtp} className="min-h-11 cursor-pointer font-black text-green-deep underline decoration-gold/60 underline-offset-4 hover:text-gold disabled:cursor-not-allowed disabled:opacity-60">{t.resend}</button>
+                    <button type="button" onClick={() => { setOtpSent(false); setOtp(""); setError(""); setResendMessage(""); }} className="min-h-11 cursor-pointer text-green-deep/65 transition-colors hover:text-green-deep">{t.changeEmail}</button>
+                  </div>
+                </form>
+              )}
+
+              {!otpSent && <>
               <button
                 type="button"
                 onClick={handleGoogleSignIn}
@@ -363,6 +487,7 @@ export default function AuthForm({ mode, locale }: AuthFormProps) {
                   {loading ? loadingText : submitText}
                 </button>
               </form>
+              </>}
 
               <div className="mt-7 flex flex-wrap items-center justify-center gap-2 font-cairo text-sm text-green-deep/68">
                 <span>{isRegister ? t.hasAccount : t.noAccount}</span>

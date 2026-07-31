@@ -1,13 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { sendRegistrationOtp } from "@/lib/email";
+import {
+  createPendingRegistrationToken,
+  digestOtp,
+  generateOtp,
+  OTP_RESEND_DELAY_SECONDS,
+  setPendingRegistrationCookie,
+} from "@/lib/registrationOtp";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password, name } = body;
+    const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+    const password = typeof body.password === "string" ? body.password : "";
+    const name = typeof body.name === "string" ? body.name.trim() : "";
 
-    if (!email || !password) {
+    if (!email || !password || !name || password.length < 6) {
       return NextResponse.json(
         { success: false, error: "Email and password are required" },
         { status: 400 }
@@ -22,20 +32,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const hashedPassword = await bcrypt.hash(password, 12);
-    const user = await prisma.user.create({
-      data: { email, password: hashedPassword, name },
-      select: { id: true, email: true, name: true, createdAt: true },
+    const passwordHash = await bcrypt.hash(password, 12);
+    const otp = generateOtp();
+    const pendingToken = createPendingRegistrationToken({
+      email,
+      name,
+      passwordHash,
+      otpDigest: digestOtp(otp),
+      attempts: 0,
+      resendAfter: Date.now() + OTP_RESEND_DELAY_SECONDS * 1000,
     });
+    await sendRegistrationOtp(email, name, otp);
 
-    return NextResponse.json(
-      { success: true, data: user, message: "User created successfully" },
-      { status: 201 }
+    const response = NextResponse.json(
+      { success: true, requiresVerification: true, email },
+      { status: 202 }
     );
-  } catch {
+    setPendingRegistrationCookie(response, pendingToken);
+    return response;
+  } catch (error) {
+    console.error("Unable to start registration verification", error);
     return NextResponse.json(
-      { success: false, error: "Internal server error" },
-      { status: 500 }
+      { success: false, error: "Email delivery unavailable" },
+      { status: 503 }
     );
   }
 }
