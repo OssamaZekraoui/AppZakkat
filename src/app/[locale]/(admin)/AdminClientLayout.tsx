@@ -4,6 +4,8 @@ import { useLocale } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { adminText, getAdminLocale } from "@/lib/adminText";
 import AppIcon, { type AppIconName } from "@/components/ui/AppIcon";
+import { AuthNotice, type AuthNoticeKind } from "@/components/auth/AuthNotice";
+import { useEffect, useState } from "react";
 
 const AUTH_TOKEN_KEY = "diyae-auth-token";
 const AUTH_USER_KEY = "diyae-auth-user";
@@ -16,6 +18,21 @@ export function AdminClientLayout({ children }: { children: React.ReactNode }) {
   const currentLocale = getAdminLocale(locale);
   const t = adminText[currentLocale];
   const isAr = currentLocale === "ar";
+  const [notice, setNotice] = useState<AuthNoticeKind | null>(null);
+
+  useEffect(() => {
+    const pendingNotice = sessionStorage.getItem(AUTH_NOTICE_KEY);
+    if (pendingNotice === "login" || pendingNotice === "logout") {
+      setNotice(pendingNotice);
+      sessionStorage.removeItem(AUTH_NOTICE_KEY);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!notice) return;
+    const timer = window.setTimeout(() => setNotice(null), 2000);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
 
   const navItems = [
     { href: "/admin", label: t.dashboard, icon: "dashboard" as AppIconName },
@@ -35,6 +52,7 @@ export function AdminClientLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-white-off text-green-deep" dir={isAr ? "rtl" : "ltr"}>
+      {notice && <AuthNotice locale={locale} notice={notice} onClose={() => setNotice(null)} />}
       <aside className="fixed inset-y-0 z-40 hidden w-72 flex-col overflow-hidden bg-green-deep text-white md:flex">
         <div className="absolute inset-0 islamic-pattern opacity-20" />
         <div className="relative border-b border-gold/20 p-6">

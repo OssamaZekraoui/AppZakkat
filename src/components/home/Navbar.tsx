@@ -4,18 +4,11 @@ import { useTranslations, useLocale } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { useEffect, useState } from "react";
 import AppIcon from "@/components/ui/AppIcon";
+import { AuthNotice, type AuthNoticeKind } from "@/components/auth/AuthNotice";
 
 const AUTH_TOKEN_KEY = "diyae-auth-token";
 const AUTH_USER_KEY = "diyae-auth-user";
 const AUTH_NOTICE_KEY = "diyae-auth-notice";
-
-type AuthNotice = "login" | "logout" | null;
-
-const noticeCopy = {
-  ar: { login: "تم تسجيل الدخول بنجاح", logout: "تم تسجيل الخروج بنجاح" },
-  fr: { login: "Connexion réussie", logout: "Déconnexion réussie" },
-  en: { login: "Signed in successfully", logout: "Signed out successfully" },
-} as const;
 
 const localeLabels: Record<string, string> = {
   ar: "ع",
@@ -30,7 +23,7 @@ export default function Navbar() {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [notice, setNotice] = useState<AuthNotice>(null);
+  const [notice, setNotice] = useState<AuthNoticeKind | null>(null);
 
   useEffect(() => {
     setIsAuthenticated(Boolean(localStorage.getItem(AUTH_TOKEN_KEY)));
@@ -43,7 +36,7 @@ export default function Navbar() {
 
   useEffect(() => {
     if (!notice) return;
-    const timer = window.setTimeout(() => setNotice(null), 4000);
+    const timer = window.setTimeout(() => setNotice(null), 2000);
     return () => window.clearTimeout(timer);
   }, [notice]);
 
@@ -238,25 +231,7 @@ export default function Navbar() {
         </div>
       )}
     </nav>
-    {notice && (
-      <div className="fixed inset-0 z-[70] flex items-center justify-center bg-green-deep/35 p-4 backdrop-blur-[2px] motion-safe:animate-[fadeIn_.2s_ease-out]">
-        <div
-          role="status"
-          aria-live="polite"
-          className="relative flex w-full max-w-sm flex-col items-center rounded-3xl border border-emerald-200 bg-white px-6 py-8 text-center text-green-deep shadow-2xl"
-        >
-          <button type="button" onClick={() => setNotice(null)} aria-label="Fermer" className="absolute end-3 top-3 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-green-deep/55 transition-colors duration-200 hover:bg-green-pale hover:text-green-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold">
-            <AppIcon name="close" className="h-5 w-5" />
-          </button>
-          <span className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
-            <AppIcon name={notice === "login" ? "success" : "logout"} className="h-8 w-8" />
-          </span>
-          <p className="mt-4 font-amiri text-2xl font-bold">
-            {noticeCopy[locale as keyof typeof noticeCopy]?.[notice] || noticeCopy.fr[notice]}
-          </p>
-        </div>
-      </div>
-    )}
+    {notice && <AuthNotice locale={locale} notice={notice} onClose={() => setNotice(null)} />}
     </>
   );
 }
