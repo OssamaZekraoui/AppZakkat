@@ -7,6 +7,7 @@ import AppIcon, { type AppIconName } from "@/components/ui/AppIcon";
 
 const AUTH_TOKEN_KEY = "diyae-auth-token";
 const AUTH_USER_KEY = "diyae-auth-user";
+const AUTH_NOTICE_KEY = "diyae-auth-notice";
 
 export function AdminClientLayout({ children }: { children: React.ReactNode }) {
   const locale = useLocale();
@@ -24,9 +25,10 @@ export function AdminClientLayout({ children }: { children: React.ReactNode }) {
   ];
 
   async function handleLogout() {
-    await fetch("/api/auth/logout", { method: "POST" });
+    await fetch("/api/auth/logout", { method: "POST" }).catch(() => undefined);
     localStorage.removeItem(AUTH_TOKEN_KEY);
     localStorage.removeItem(AUTH_USER_KEY);
+    sessionStorage.setItem(AUTH_NOTICE_KEY, "logout");
     router.replace("/login");
     router.refresh();
   }
