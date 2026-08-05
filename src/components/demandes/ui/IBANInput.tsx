@@ -80,11 +80,12 @@ export default function IBANInput({
 
   return (
     <div>
-      <label className="block font-cairo font-semibold text-green-deep text-sm mb-1.5">
+      <label htmlFor="beneficiary-iban" className="block font-cairo font-semibold text-green-deep text-sm mb-1.5">
         IBAN
       </label>
       <div className="relative">
         <input
+          id="beneficiary-iban"
           type="text"
           value={formatIBAN(value)}
           onChange={handleChange}
@@ -101,6 +102,8 @@ export default function IBANInput({
                           : "border-green-deep/10 focus:border-gold focus:ring-2 focus:ring-gold/20"
                       }`}
           dir="ltr"
+          aria-invalid={Boolean(error) || (touched && !isValid)}
+          aria-describedby="beneficiary-iban-help beneficiary-iban-error"
         />
         {/* Status indicator */}
         {clean.length > 4 && (
@@ -115,7 +118,7 @@ export default function IBANInput({
       </div>
 
       {/* Info line */}
-      <div className="mt-1.5 flex items-center justify-between">
+      <div id="beneficiary-iban-help" className="mt-1.5 flex items-center justify-between">
         <div className="flex items-center gap-2">
           {country && (
             <span className="text-xs font-lato text-green-deep/40">
@@ -136,7 +139,7 @@ export default function IBANInput({
       </div>
 
       {error && (
-        <p className="mt-1 text-xs text-red-500 font-cairo">{error}</p>
+        <p id="beneficiary-iban-error" role="alert" className="mt-1 text-xs text-red-600 font-cairo">{error}</p>
       )}
     </div>
   );

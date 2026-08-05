@@ -98,14 +98,14 @@ export default function Step7Results({
       </div>
 
       <div className="bg-white rounded-2xl border border-green-deep/10 overflow-hidden">
-        <button onClick={() => setShowBreakdown(!showBreakdown)} className="w-full p-4 bg-green-pale/20 border-b border-green-deep/10 flex items-center justify-between">
+        <button type="button" onClick={() => setShowBreakdown(!showBreakdown)} aria-expanded={showBreakdown} aria-controls="zakat-breakdown" className="flex min-h-12 w-full cursor-pointer items-center justify-between border-b border-green-deep/10 bg-green-pale/20 p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold">
           <h3 className="font-cairo font-bold text-green-deep">
             {pickText(locale, { ar: "التفاصيل حسب الفئة", fr: "Détail par catégorie", en: "Breakdown by category" })}
           </h3>
           <AppIcon name={showBreakdown ? "chevron-up" : "chevron-down"} className="h-5 w-5 text-green-deep/50" />
         </button>
         {showBreakdown && (
-          <div className="divide-y divide-green-deep/5">
+          <div id="zakat-breakdown" className="divide-y divide-green-deep/5">
             {result.breakdown.filter((b) => b.amount !== 0).map((b, i) => (
               <div key={i} className="px-4 py-3 flex items-center justify-between">
                 <div>
@@ -131,14 +131,14 @@ export default function Step7Results({
       </div>
 
       <div className="bg-white rounded-2xl border border-green-deep/10 overflow-hidden">
-        <button onClick={() => setShowSchoolComp(!showSchoolComp)} className="w-full p-4 bg-green-pale/20 border-b border-green-deep/10 flex items-center justify-between">
+        <button type="button" onClick={() => setShowSchoolComp(!showSchoolComp)} aria-expanded={showSchoolComp} aria-controls="zakat-school-comparison" className="flex min-h-12 w-full cursor-pointer items-center justify-between border-b border-green-deep/10 bg-green-pale/20 p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold">
           <h3 className="font-cairo font-bold text-green-deep">
             {pickText(locale, { ar: "مقارنة بين المذاهب", fr: "Comparaison entre écoles", en: "School comparison" })}
           </h3>
           <AppIcon name={showSchoolComp ? "chevron-up" : "chevron-down"} className="h-5 w-5 text-green-deep/50" />
         </button>
         {showSchoolComp && (
-          <div className="divide-y divide-green-deep/5">
+          <div id="zakat-school-comparison" className="divide-y divide-green-deep/5">
             {(Object.entries(result.schoolComparison) as [ZakatSchool, number][]).map(([school, amount]) => (
               <div key={school} className={`px-4 py-3 flex items-center justify-between ${school === result.school ? "bg-gold/5" : ""}`}>
                 <span className="font-cairo text-sm text-green-deep">
@@ -159,7 +159,7 @@ export default function Step7Results({
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">
-        <button onClick={onReset} className="flex-1 px-6 py-3 rounded-xl bg-green-deep/5 text-green-deep font-cairo font-bold hover:bg-green-deep/10 transition-colors">
+        <button type="button" onClick={onReset} className="min-h-12 flex-1 cursor-pointer rounded-xl bg-green-deep/5 px-6 py-3 font-cairo font-bold text-green-deep transition-colors hover:bg-green-deep/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold">
           {pickText(locale, { ar: "حساب جديد", fr: "Nouveau calcul", en: "New calculation" })}
         </button>
       </div>

@@ -65,11 +65,17 @@ export default function Navbar() {
 
   return (
     <>
+    <a
+      href="#main-content"
+      className="fixed start-4 top-2 z-[100] -translate-y-20 rounded-lg bg-gold px-4 py-3 font-cairo font-bold text-green-deep shadow-lg transition-transform focus:translate-y-0"
+    >
+      {locale === "ar" ? "انتقل إلى المحتوى" : locale === "en" ? "Skip to content" : "Aller au contenu"}
+    </a>
     <nav className="fixed top-0 left-0 right-0 z-50 bg-green-deep/95 backdrop-blur-sm border-b border-gold/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="group flex items-center">
+          <Link href="/" className="group flex min-h-11 items-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold">
             {locale === "ar" ? (
               <span className="relative select-none">
                 <span className="text-gold font-amiri text-3xl sm:text-4xl font-bold drop-shadow-[0_0_8px_rgba(201,168,76,0.4)] group-hover:drop-shadow-[0_0_12px_rgba(201,168,76,0.6)] transition-all duration-300">
@@ -94,7 +100,7 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-white/80 hover:text-white text-sm font-cairo transition-colors"
+                  className="flex min-h-11 items-center rounded-md px-1 text-white/80 hover:text-white text-sm font-cairo transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
                 >
                   {link.label}
                 </Link>
@@ -102,7 +108,7 @@ export default function Navbar() {
                 <a
                   key={link.href}
                   href={link.href}
-                  className="text-white/80 hover:text-white text-sm font-cairo transition-colors"
+                  className="flex min-h-11 items-center rounded-md px-1 text-white/80 hover:text-white text-sm font-cairo transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
                 >
                   {link.label}
                 </a>
@@ -110,7 +116,7 @@ export default function Navbar() {
             )}
             <a
               href="#support-site"
-              className="text-gold hover:text-gold-light text-sm font-cairo font-bold transition-colors"
+              className="flex min-h-11 items-center rounded-md px-1 text-gold hover:text-gold-light text-sm font-cairo font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
             >
               {t("supportSite")}
             </a>
@@ -149,7 +155,9 @@ export default function Navbar() {
                   key={loc}
                   href={pathname || "/"}
                   locale={loc}
-                  className={`px-2 py-1 text-xs rounded-full transition-colors ${
+                  aria-current={locale === loc ? "page" : undefined}
+                  aria-label={loc === "ar" ? "العربية" : loc === "fr" ? "Français" : "English"}
+                  className={`flex h-11 min-w-11 items-center justify-center rounded-full px-2 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${
                     locale === loc
                       ? "bg-gold text-green-deep font-bold"
                       : "text-white/70 hover:text-white"

@@ -187,6 +187,7 @@ export default function AuthForm({ mode, locale }: AuthFormProps) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const title = otpSent ? t.otpTitle : isRegister ? t.registerTitle : t.loginTitle;
   const subtitle = otpSent ? `${t.otpSubtitle}: ${email}` : isRegister ? t.registerSubtitle : t.loginSubtitle;
@@ -323,6 +324,8 @@ export default function AuthForm({ mode, locale }: AuthFormProps) {
 
   return (
     <main
+      id="main-content"
+      tabIndex={-1}
       className="min-h-screen bg-white-off pt-24 pb-14"
       dir={isRtl ? "rtl" : "ltr"}
     >
@@ -443,19 +446,31 @@ export default function AuthForm({ mode, locale }: AuthFormProps) {
                   />
                 </label>
 
-                <label className="block">
-                  <span className="mb-2 block font-cairo text-sm font-bold text-green-deep">
+                <div className="block">
+                  <label htmlFor="auth-password" className="mb-2 block font-cairo text-sm font-bold text-green-deep">
                     {t.password}
-                  </span>
+                  </label>
+                  <div className="relative">
                   <input
+                    id="auth-password"
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
-                    className="w-full rounded-2xl border-2 border-green-deep/12 bg-white px-5 py-4 text-left font-lato text-lg text-green-deep outline-none transition focus:border-gold focus:ring-4 focus:ring-gold/15"
+                    className="w-full rounded-2xl border-2 border-green-deep/12 bg-white py-4 ps-5 pe-16 text-left font-lato text-lg text-green-deep outline-none transition focus:border-gold focus:ring-4 focus:ring-gold/15"
                     dir="ltr"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     autoComplete={isRegister ? "new-password" : "current-password"}
                   />
-                </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((value) => !value)}
+                    aria-label={showPassword ? (currentLocale === "ar" ? "إخفاء كلمة المرور" : currentLocale === "en" ? "Hide password" : "Masquer le mot de passe") : (currentLocale === "ar" ? "إظهار كلمة المرور" : currentLocale === "en" ? "Show password" : "Afficher le mot de passe")}
+                    aria-pressed={showPassword}
+                    className="absolute end-2 top-1/2 flex h-11 w-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-xl text-green-deep/60 transition-colors hover:bg-green-pale/50 hover:text-green-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                  >
+                    <AppIcon name="eye" className="h-5 w-5" />
+                  </button>
+                  </div>
+                </div>
 
                 {isRegister && (
                   <label className="block">
@@ -474,7 +489,7 @@ export default function AuthForm({ mode, locale }: AuthFormProps) {
                 )}
 
                 {error && (
-                  <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 font-cairo text-sm font-bold text-red-700">
+                  <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 font-cairo text-sm font-bold text-red-700">
                     {error}
                   </div>
                 )}
@@ -482,7 +497,7 @@ export default function AuthForm({ mode, locale }: AuthFormProps) {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full rounded-2xl bg-gold px-6 py-4 font-cairo text-lg font-black text-green-deep shadow-lg shadow-gold/25 transition hover:bg-gold-light disabled:cursor-not-allowed disabled:opacity-70"
+                  className="w-full cursor-pointer rounded-2xl bg-gold px-6 py-4 font-cairo text-lg font-black text-green-deep shadow-lg shadow-gold/25 transition hover:bg-gold-light focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-gold/25 disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   {loading ? loadingText : submitText}
                 </button>

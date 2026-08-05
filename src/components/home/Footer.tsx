@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 export default function Footer() {
   const t = useTranslations("footer");
@@ -24,21 +25,19 @@ export default function Footer() {
             <h4 className="font-cairo font-bold text-gold mb-3">{t("navigation")}</h4>
             <ul className="space-y-2">
               <li>
-                <a href="/" className="text-white/60 hover:text-white font-cairo text-sm transition-colors">
+                <Link href="/" className="inline-flex min-h-11 items-center rounded-md text-white/70 hover:text-white font-cairo text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold">
                   {t("home")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#requests" className="text-white/60 hover:text-white font-cairo text-sm transition-colors">
+                <Link href="/#how-it-works" className="inline-flex min-h-11 items-center rounded-md text-white/70 hover:text-white font-cairo text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold">
                   {t("about")}
-                </a>
+                </Link>
               </li>
               <li>
                 <a
-                  href="https://mail.google.com/mail/?view=cm&fs=1&to=ossama.zekaroui@gmail.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-white/60 hover:text-white font-cairo text-sm transition-colors"
+                  href="mailto:ossama.zekaroui@gmail.com?subject=Support%20Diyae"
+                  className="inline-flex min-h-11 items-center rounded-md text-white/70 hover:text-white font-cairo text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
                 >
                   {t("technicalSupport")}
                 </a>
@@ -51,14 +50,14 @@ export default function Footer() {
             <h4 className="font-cairo font-bold text-gold mb-3">{t("legal")}</h4>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-white/60 hover:text-white font-cairo text-sm transition-colors">
+                <Link href="/conditions" className="inline-flex min-h-11 items-center rounded-md text-white/70 hover:text-white font-cairo text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold">
                   {t("terms")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-white/60 hover:text-white font-cairo text-sm transition-colors">
+                <Link href="/confidentialite" className="inline-flex min-h-11 items-center rounded-md text-white/70 hover:text-white font-cairo text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold">
                   {t("privacy")}
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -68,14 +67,14 @@ export default function Footer() {
             <h4 className="font-cairo font-bold text-gold mb-3">{t("transparency")}</h4>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-white/60 hover:text-white font-cairo text-sm transition-colors">
+                <Link href="/transparence#rapport-annuel" className="inline-flex min-h-11 items-center rounded-md text-white/70 hover:text-white font-cairo text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold">
                   {t("annualReport")}
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-white/60 hover:text-white font-cairo text-sm transition-colors">
+                <Link href="/transparence#etats-financiers" className="inline-flex min-h-11 items-center rounded-md text-white/70 hover:text-white font-cairo text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold">
                   {t("financialStatements")}
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

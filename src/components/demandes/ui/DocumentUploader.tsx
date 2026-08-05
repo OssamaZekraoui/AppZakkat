@@ -163,15 +163,15 @@ export default function DocumentUploader({
         </div>
       ) : (
         /* Upload zone */
-        <div
+        <label
+          htmlFor={`document-${category}`}
           onDragOver={(e) => {
             e.preventDefault();
             setDragOver(true);
           }}
           onDragLeave={() => setDragOver(false)}
           onDrop={handleDrop}
-          onClick={() => fileRef.current?.click()}
-          className={`relative p-6 rounded-xl border-2 border-dashed cursor-pointer transition-all text-center ${
+          className={`relative block cursor-pointer rounded-xl border-2 border-dashed p-6 text-center transition-all focus-within:ring-4 focus-within:ring-gold/20 ${
             dragOver
               ? "border-gold bg-gold/5"
               : "border-green-deep/15 hover:border-green-deep/30 bg-white"
@@ -205,6 +205,7 @@ export default function DocumentUploader({
             </>
           )}
           <input
+            id={`document-${category}`}
             ref={fileRef}
             type="file"
             accept=".pdf,.jpg,.jpeg,.png,.heic"
@@ -213,13 +214,14 @@ export default function DocumentUploader({
               if (file) handleFile(file);
               e.target.value = "";
             }}
-            className="hidden"
+            className="sr-only"
+            aria-label={label}
           />
-        </div>
+        </label>
       )}
 
       {error && (
-        <p className="text-xs text-red-500 font-cairo">{error}</p>
+        <p role="alert" className="text-xs text-red-600 font-cairo">{error}</p>
       )}
     </div>
   );
