@@ -32,7 +32,6 @@ export async function GET(
       isAnonymous: r.isAnonymous,
       country: r.country,
       city: (docs.city as string) || "",
-      contactEmail: (docs.contactEmail as string) || "",
       titleAr: r.titleAr,
       titleFr: r.titleFr || "",
       descriptionAr: r.descriptionAr,

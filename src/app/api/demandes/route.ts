@@ -38,7 +38,12 @@ export async function POST(request: NextRequest) {
           isAnonymous: body.isAnonymous || false,
           deadline: body.deadline ? new Date(body.deadline) : null,
           titleFr: body.titleFr || null,
-          documents: body.documents || [],
+          documents: {
+            files: body.documents || [],
+            city: body.city || "",
+            contactEmail: body.contactEmail || "",
+            contactPhone: body.contactPhone || "",
+          },
           status: "DRAFT",
         },
       });
@@ -72,7 +77,18 @@ export async function POST(request: NextRequest) {
         isUrgent: data.urgencyLevel === "URGENT" || data.urgencyLevel === "CRITICAL",
         isAnonymous: data.isAnonymous,
         deadline: data.deadline ? new Date(data.deadline) : null,
-        documents: data.documents,
+        documents: {
+          files: data.documents,
+          city: data.city,
+          contactEmail: data.contactEmail,
+          contactPhone: data.contactPhone || "",
+          currency: data.currency,
+          breakdown: data.breakdown,
+          beneficiaryName: data.beneficiaryName,
+          bic: data.bic,
+          bankName: data.bankName,
+          bankCountry: data.bankCountry,
+        },
         status: "SUBMITTED",
       },
     });

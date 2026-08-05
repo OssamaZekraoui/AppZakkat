@@ -24,10 +24,12 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     });
     
     if (!req) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    const docs = (req.documents as Record<string, unknown>) || {};
     const formatted = {
       ...req,
       displayName: req.user?.name || "Unknown",
-      contactEmail: req.user?.email || "N/A",
+      contactEmail: (docs.contactEmail as string) || req.user?.email || "N/A",
+      contactPhone: (docs.contactPhone as string) || "N/A",
       bic: "N/A",
       bankName: "Registered Bank",
       targetAmount: Number(req.targetAmount),
